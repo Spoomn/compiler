@@ -155,8 +155,10 @@ StateMachineClass::StateMachineClass(){
 MachineState StateMachineClass::UpdateState(char currentCharacter, TokenType & previousTokenType){
     MSG("Updating state for character: " << "'" << currentCharacter << "'");
     CharacterType charType = BAD_CHAR;
-
-    if(isdigit(currentCharacter))
+    
+    if(currentCharacter == '\n')
+        charType = RETURN_CHAR;
+    else if(isdigit(currentCharacter))
         charType = DIGIT_CHAR;
     else if(isalpha(currentCharacter))
         charType = LETTER_CHAR;
@@ -188,8 +190,6 @@ MachineState StateMachineClass::UpdateState(char currentCharacter, TokenType & p
         charType = SLASH_CHAR;
     else if(currentCharacter == '*')
         charType = ASTERISK_CHAR;
-    else if(currentCharacter == '\n')
-        charType = RETURN_CHAR;
     else if(currentCharacter == EOF)
         charType = ENDFILE_CHAR;
 
