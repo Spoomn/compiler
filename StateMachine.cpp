@@ -45,20 +45,21 @@ StateMachineClass::StateMachineClass(){
         mLegalMoves[START_STATE][LESS_CHAR] = LESS_STATE;
 
         // Less Equal State
-        mLegalMoves[LESS_STATE][EQUAL_CHAR] = LESSEQUAL_STATE;
+        mLegalMoves[LESS_STATE][ASSIGNMENT_CHAR] = LESSEQUAL_STATE;
 
         // Greater State
         mLegalMoves[START_STATE][GREATER_CHAR] = GREATER_STATE;
 
         // Greater Equal State
-        mLegalMoves[GREATER_STATE][EQUAL_CHAR] = GREATEREQUAL_STATE;
+        mLegalMoves[GREATER_STATE][ASSIGNMENT_CHAR] = GREATEREQUAL_STATE;
 
-        // Equal State
-        mLegalMoves[START_STATE][EQUAL_CHAR] = EQUAL_STATE;
+        // Equal States
+        mLegalMoves[START_STATE][ASSIGNMENT_CHAR] = ASSIGNMENT_STATE;
+        mLegalMoves[ASSIGNMENT_STATE][ASSIGNMENT_CHAR] = EQUAL_STATE;
 
         // Not Equal State
         mLegalMoves[START_STATE][EXCLAMATION_CHAR] = EXCLAMATION_STATE;
-        mLegalMoves[EXCLAMATION_STATE][EQUAL_CHAR] = NOTEQUAL_STATE;
+        mLegalMoves[EXCLAMATION_STATE][ASSIGNMENT_CHAR] = NOTEQUAL_STATE;
 
     // Insertion State
     mLegalMoves[LESS_STATE][LESS_CHAR] = INSERTION_STATE;
@@ -145,6 +146,7 @@ StateMachineClass::StateMachineClass(){
     mCorrespondingTokenTypes[INSERTION_STATE] = INSERTION_TOKEN;
     mCorrespondingTokenTypes[SEMICOLON_STATE] = SEMICOLON_TOKEN;
     mCorrespondingTokenTypes[EQUAL_STATE] = EQUAL_TOKEN;
+    mCorrespondingTokenTypes[ASSIGNMENT_STATE] = ASSIGNMENT_TOKEN;    
     mCorrespondingTokenTypes[LPAREN_STATE] = LPAREN_TOKEN;
     mCorrespondingTokenTypes[RPAREN_STATE] = RPAREN_TOKEN;
     mCorrespondingTokenTypes[LCURLY_STATE] = LCURLY_TOKEN;
@@ -155,7 +157,7 @@ StateMachineClass::StateMachineClass(){
 MachineState StateMachineClass::UpdateState(char currentCharacter, TokenType & previousTokenType){
     MSG("Updating state for character: " << "'" << currentCharacter << "'");
     CharacterType charType = BAD_CHAR;
-    
+
     if(currentCharacter == '\n')
         charType = RETURN_CHAR;
     else if(isdigit(currentCharacter))
@@ -171,7 +173,7 @@ MachineState StateMachineClass::UpdateState(char currentCharacter, TokenType & p
     else if(currentCharacter == ';')
         charType = SEMICOLON_CHAR;
     else if(currentCharacter == '=')
-        charType = EQUAL_CHAR;
+        charType = ASSIGNMENT_CHAR;
     else if(currentCharacter == '<')
         charType = LESS_CHAR;
     else if(currentCharacter == '>')

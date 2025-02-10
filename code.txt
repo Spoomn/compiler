@@ -5,11 +5,23 @@ void main (){
         cout << sum;
     }
 } 
+
+int y = 5
+
+if(y < 5){
+    y = 5
+}
+
 <
-<=
 >
+<=
 >=
+// math!
+4 * 5 = 20
+
 sum = 20 / 4
+
+
 /* Block Comment 
 Ignore this line */
 
