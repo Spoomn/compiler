@@ -6,10 +6,10 @@ CXX = clang++
 CXXFLAGS = -Wall -g -stdlib=libc++ -std=c++11
 
 # Output program name
-TARGET = myProgram
+TARGET = main
 
 # Source files
-SRCS = Main.cpp Token.cpp StateMachine.cpp Scanner.cpp Symbol.cpp
+SRCS = Main.cpp Token.cpp StateMachine.cpp Scanner.cpp Symbol.cpp Node.cpp
 
 # Object files
 OBJS = $(SRCS:.cpp=.o)
