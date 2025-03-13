@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <iostream>
 #include "Symbol.h"
 class Node;
 class StartNode;
@@ -47,14 +48,6 @@ class ProgramNode : public Node {
         BlockNode* block;
 };
 
-class BlockNode : public Node {
-    public:
-        BlockNode(StatementGroupNode* statementGroup);
-        ~BlockNode();
-    private:
-        StatementGroupNode* statementGroup;
-};
-
 class StatementGroupNode : public Node {
     public:
         void AddStatement(StatementNode* statement);
@@ -66,6 +59,14 @@ class StatementGroupNode : public Node {
 class StatementNode : public Node {
     public:
         virtual ~StatementNode() {};
+};
+
+class BlockNode : public StatementNode {
+    public:
+        BlockNode(StatementGroupNode* statementGroup);
+        ~BlockNode();
+    private:
+        StatementGroupNode* statementGroup;
 };
 
 class DeclarationStatementNode : public StatementNode {
@@ -86,9 +87,10 @@ class AssignmentStatementNode : public StatementNode {
 };
 
 class ExpressionNode {
+    
     public:
         virtual int Evaluate() const = 0;    
-        virtual ~ExpressionNode() {};
+        virtual ~ExpressionNode() {std::cout << "Deleting ExpressionNode\n";}
     };
 
     
@@ -98,7 +100,7 @@ class IdentifierNode : public ExpressionNode {
 
         void DeclareVariable() const;
         void SetValue(int v) const;
-        void GetIndex() const;
+        int GetIndex() const;
         int Evaluate() const override;
     private:
         std::string label;

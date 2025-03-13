@@ -1,0 +1,1 @@
+VOID MAIN ( ) { INT x; x = 42; COUT << x; }

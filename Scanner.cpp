@@ -54,10 +54,33 @@ TokenClass ScannerClass::GetNextToken(){
     lexeme.pop_back();
     mFin.unget();
     MSG("Number of lines: " << ScannerClass::GetLineNumber());
+    if (previousTokenType == IDENTIFIER_TOKEN) {
+        if (lexeme == "VOID") {
+             previousTokenType = VOID_TOKEN;
+        } else if (lexeme == "MAIN") {
+             previousTokenType = MAIN_TOKEN;
+        } else if (lexeme == "INT") {
+             previousTokenType = INT_TOKEN;
+        } else if (lexeme == "COUT") {
+             previousTokenType = COUT_TOKEN;
+        }
+    }
     TokenClass tc(previousTokenType, lexeme);
     return tc;
 }
 
 int ScannerClass::GetLineNumber() const{
     return mLineNumber;
+}
+
+TokenClass ScannerClass::PeekNextToken(){
+    std::streampos pos = mFin.tellg();
+    int savedLine = mLineNumber;
+    TokenClass tc = GetNextToken();
+    if(!mFin){
+        mFin.clear();
+    }
+    mFin.seekg(pos);
+    mLineNumber = savedLine;
+    return tc;
 }

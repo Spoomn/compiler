@@ -9,7 +9,7 @@ CXXFLAGS = -Wall -g -stdlib=libc++ -std=c++11
 TARGET = main
 
 # Source files
-SRCS = Main.cpp Token.cpp StateMachine.cpp Scanner.cpp Symbol.cpp Node.cpp
+SRCS = Main.cpp Token.cpp StateMachine.cpp Scanner.cpp Symbol.cpp Node.cpp Parser.cpp
 
 # Object files
 OBJS = $(SRCS:.cpp=.o)

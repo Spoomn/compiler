@@ -15,6 +15,8 @@ class ScannerClass {
 
         int GetLineNumber() const;
 
+        TokenClass PeekNextToken();
+
 
     private:
         std::ifstream mFin;

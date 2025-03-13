@@ -44,8 +44,8 @@ void IdentifierNode::DeclareVariable() const {
 void IdentifierNode::SetValue(int v) const {
     symbolTable->SetValue(label, v);
 }
-void IdentifierNode::GetIndex() const {
-    symbolTable->GetIndex(label);
+int IdentifierNode::GetIndex() const {
+    return symbolTable->GetIndex(label);
 }
 int IdentifierNode::Evaluate() const {
     return symbolTable->GetValue(label);

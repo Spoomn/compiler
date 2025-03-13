@@ -3,6 +3,7 @@
 #include "StateMachine.h"
 #include "Symbol.h"
 #include "Node.h"
+#include "Parser.h"
 #include <iostream>
 #include <cassert>
 #include <stdexcept>
@@ -10,11 +11,13 @@
 void TestScanner();
 void TestSymbolTable();
 void TestParseTree();
+void TestParser();
 
 int main() {
     TestScanner();
     TestSymbolTable();
     TestParseTree();
+    TestParser();
 
     return 0;
 }
@@ -147,21 +150,53 @@ void TestSymbolTable() {
 
 void TestParseTree() {
     std::cout << "\n-- UNIT TEST: Parse Tree --\n" << std::endl;
+    SymbolTableClass symTab;
 
-    ExpressionNode* three = new IntegerNode(3);
-    ExpressionNode* four = new IntegerNode(4);
-    ExpressionNode* ten = new IntegerNode(10);
-    ExpressionNode* two = new IntegerNode(2);
+    IdentifierNode* declId = new IdentifierNode("x", &symTab);
+    DeclarationStatementNode* declStmt = new DeclarationStatementNode(declId);
+    
+    IdentifierNode* assignId = new IdentifierNode("x", &symTab);
+    ExpressionNode* intThree = new IntegerNode(3);
+    ExpressionNode* intFour = new IntegerNode(4);
+    ExpressionNode* plusExpr = new PlusNode(intThree, intFour);
+    AssignmentStatementNode* assignStmt = new AssignmentStatementNode(assignId, plusExpr);
 
-    ExpressionNode* addNode = new PlusNode(three, four);    // (3 + 4)
-    ExpressionNode* subNode = new MinusNode(ten, two);      // (10 - 2)
-    ExpressionNode* mulNode = new TimesNode(addNode, subNode); // (3 + 4) * (10 - 2)
+    IdentifierNode* coutID = new IdentifierNode("x", &symTab);
+    CoutStatementNode* coutStmt = new CoutStatementNode(coutID);
 
-    int result = mulNode->Evaluate();
-    std::cout << "Expression evaluates to: " << result << std::endl;
-    assert(result == 56);
+    StatementGroupNode* stmtGroup = new StatementGroupNode();
+    stmtGroup->AddStatement(declStmt);
+    stmtGroup->AddStatement(assignStmt);
+    stmtGroup->AddStatement(coutStmt);
 
-    delete mulNode;
+    BlockNode* block = new BlockNode(stmtGroup);
+
+    ProgramNode* program = new ProgramNode(block);
+
+    StartNode* start = new StartNode(program);
+    int mathResult = plusExpr->Evaluate();
+    assert(mathResult == 7);
+    std::cout << "Math result: " << mathResult << std::endl;
+    delete start;
 
     std::cout << "Parse tree nodes successfully deleted." << std::endl;
+}
+
+void TestParser() {
+    std::cout << "\n-- UNIT TEST: Parser --\n" << std::endl;
+    
+    const std::string testFiles[] = {
+        "parser_test_1.txt",
+        "parser_test_2.txt",
+        "parser_test_3.txt"
+    };
+    int numTests = sizeof(testFiles) / sizeof(testFiles[0]);
+    for (int i = 0; i < numTests; i++) {
+        std::cout << "\nTest " << (i + 1) << ": " << testFiles[i] << std::endl;
+        ScannerClass scanner(testFiles[i]);
+        SymbolTableClass symTab;
+        ParserClass parser(&scanner, &symTab);
+        parser.Start();
+        std::cout << "Test " << (i + 1) << " passed successfully." << std::endl;
+    }
 }
