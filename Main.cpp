@@ -158,7 +158,7 @@ void TestParseTree() {
     IdentifierNode* assignId = new IdentifierNode("x", &symTab);
     ExpressionNode* intThree = new IntegerNode(3);
     ExpressionNode* intFour = new IntegerNode(4);
-    ExpressionNode* plusExpr = new PlusNode(intThree, intFour);
+    ExpressionNode* plusExpr = new TimesNode(intThree, intFour);
     AssignmentStatementNode* assignStmt = new AssignmentStatementNode(assignId, plusExpr);
 
     IdentifierNode* coutID = new IdentifierNode("x", &symTab);
@@ -175,7 +175,7 @@ void TestParseTree() {
 
     StartNode* start = new StartNode(program);
     int mathResult = plusExpr->Evaluate();
-    assert(mathResult == 7);
+    assert(mathResult == 12);
     std::cout << "Math result: " << mathResult << std::endl;
     delete start;
 
