@@ -30,12 +30,17 @@ class NotEqualNode;
 class Node {
     public:
         virtual ~Node() {};
+        virtual void PrintTree(int indent = 0) const = 0;
+        virtual void Interpret() const = 0;
+
 };
 
 class StartNode : public Node {
     public:
         StartNode(ProgramNode* program);
-        ~StartNode();
+        ~StartNode() ;
+        virtual void PrintTree(int indent = 0) const override;
+        virtual void Interpret() const override;
     private:
         ProgramNode* program;
 };
@@ -44,6 +49,8 @@ class ProgramNode : public Node {
     public:
         ProgramNode(BlockNode* block);
         ~ProgramNode();
+        virtual void PrintTree(int indent = 0) const override;
+        virtual void Interpret() const override;
     private:
         BlockNode* block;
 };
@@ -52,10 +59,14 @@ class StatementGroupNode : public Node {
     public:
         void AddStatement(StatementNode* statement);
         ~StatementGroupNode();
+        virtual void PrintTree(int indent = 0) const override;
+        virtual void Interpret() const override;
     private:
         std::vector<StatementNode*> statements;
 };
 
+// STATEMENT NODES
+// These nodes are used to represent statements in the parse tree.
 class StatementNode : public Node {
     public:
         virtual ~StatementNode() {};
@@ -65,6 +76,8 @@ class BlockNode : public StatementNode {
     public:
         BlockNode(StatementGroupNode* statementGroup);
         ~BlockNode();
+        virtual void PrintTree(int indent = 0) const override;
+        virtual void Interpret() const override;
     private:
         StatementGroupNode* statementGroup;
 };
@@ -73,24 +86,65 @@ class DeclarationStatementNode : public StatementNode {
     public:
         DeclarationStatementNode(IdentifierNode* identifier);
         ~DeclarationStatementNode();
+        void virtual PrintTree(int indent = 0) const override;
+        void virtual Interpret() const override;
     private:
         IdentifierNode* identifier;
 };
 
+// These nodes are used to represent assignment statements in the parse tree.
 class AssignmentStatementNode : public StatementNode {
     public:
         AssignmentStatementNode(IdentifierNode* identifier, ExpressionNode* expression);
         ~AssignmentStatementNode();
+        void virtual PrintTree(int indent = 0) const override;
+        void virtual Interpret() const override;
     private:
         IdentifierNode* identifier;
         ExpressionNode* expression;
 };
 
+class CoutStatementNode : public StatementNode {
+    public:
+        CoutStatementNode(ExpressionNode* expression);
+        ~CoutStatementNode();
+        void virtual PrintTree(int indent = 0) const override;
+        void virtual Interpret() const override;
+    private:
+        ExpressionNode* expression;
+};
+
+class IfStatementNode : public StatementNode {
+    public:
+        IfStatementNode(ExpressionNode* condition, StatementNode* trueBlock, StatementNode* falseBlock);
+        ~IfStatementNode();
+        void virtual PrintTree(int indent = 0) const override;
+        void virtual Interpret() const override;
+    private:
+        ExpressionNode* condition;
+        StatementNode* thenStmt;
+        StatementNode* elseStmt;
+};
+
+class WhileStatementNode : public StatementNode {
+    public:
+        WhileStatementNode(ExpressionNode* condition, StatementNode* body);
+        ~WhileStatementNode();
+        void virtual PrintTree(int indent = 0) const override;
+        void virtual Interpret() const override;
+    private:
+        ExpressionNode* condition;
+        StatementNode* body;
+};
+
+// EXPRESSION NODES
+// These nodes are used to represent expressions in the parse tree.
 class ExpressionNode {
     
     public:
         virtual int Evaluate() const = 0;    
-        virtual ~ExpressionNode() {std::cout << "Deleting ExpressionNode\n";}
+        virtual ~ExpressionNode();
+        virtual void PrintTree(int indent = 0) const = 0;
     };
 
     
@@ -102,23 +156,19 @@ class IdentifierNode : public ExpressionNode {
         void SetValue(int v) const;
         int GetIndex() const;
         int Evaluate() const override;
+
+        void virtual PrintTree(int indent = 0) const override;
     private:
         std::string label;
         SymbolTableClass* symbolTable;
 };
 
-class CoutStatementNode : public StatementNode {
-    public:
-        CoutStatementNode(ExpressionNode* expression);
-        ~CoutStatementNode();
-    private:
-        ExpressionNode* expression;
-};
 
 class IntegerNode : public ExpressionNode {
     public:
         IntegerNode(int value);
         int Evaluate() const override;
+        void virtual PrintTree(int indent = 0) const override;
     private:
         int value;
 };
@@ -127,6 +177,7 @@ class BinaryOperatorNode : public ExpressionNode {
     public:
         BinaryOperatorNode(ExpressionNode* left, ExpressionNode* right);
         virtual ~BinaryOperatorNode();
+        void virtual PrintTree(int indent = 0) const override;
     protected:
         ExpressionNode* left;
         ExpressionNode* right;
@@ -136,59 +187,92 @@ class PlusNode : public BinaryOperatorNode {
     public:
         PlusNode(ExpressionNode* left, ExpressionNode* right);
         int Evaluate() const override;
+        void virtual PrintTree(int indent = 0) const override;
 };
 
 class MinusNode : public BinaryOperatorNode {
     public:
         MinusNode(ExpressionNode* left, ExpressionNode* right);
         int Evaluate() const override;
+        void virtual PrintTree(int indent = 0) const override;
 };
 
 class TimesNode : public BinaryOperatorNode {
     public:
         TimesNode(ExpressionNode* left, ExpressionNode* right);
         int Evaluate() const override;
+        void virtual PrintTree(int indent = 0) const override;
+
 };
 
 class DivideNode : public BinaryOperatorNode {
     public:
         DivideNode(ExpressionNode* left, ExpressionNode* right);
         int Evaluate() const override;
+        void virtual PrintTree(int indent = 0) const override;
+
 };
 
 class LessNode : public BinaryOperatorNode {
     public:
         LessNode(ExpressionNode* left, ExpressionNode* right);
         int Evaluate() const override;
+        void virtual PrintTree(int indent = 0) const override;
+
 };
 
 class LessEqualNode : public BinaryOperatorNode {
     public:
         LessEqualNode(ExpressionNode* left, ExpressionNode* right);
         int Evaluate() const override;
+        void virtual PrintTree(int indent = 0) const override;
+
 };
 
 class GreaterNode : public BinaryOperatorNode {
     public:
         GreaterNode(ExpressionNode* left, ExpressionNode* right);
         int Evaluate() const override;
+        void virtual PrintTree(int indent = 0) const override;
+
 };
 
 class GreaterEqualNode : public BinaryOperatorNode {
     public:
         GreaterEqualNode(ExpressionNode* left, ExpressionNode* right);
         int Evaluate() const override;
+        void virtual PrintTree(int indent = 0) const override;
+
 };
 
 class EqualNode : public BinaryOperatorNode {
     public:
         EqualNode(ExpressionNode* left, ExpressionNode* right);
         int Evaluate() const override;
+        void virtual PrintTree(int indent = 0) const override;
+
 };
 
 class NotEqualNode : public BinaryOperatorNode {
     public:
         NotEqualNode(ExpressionNode* left, ExpressionNode* right);
         int Evaluate() const override;
+        void virtual PrintTree(int indent = 0) const override;
+
 };
 
+class AndNode : public BinaryOperatorNode {
+    public:
+        AndNode(ExpressionNode* left, ExpressionNode* right);
+        int Evaluate() const override;
+        void virtual PrintTree(int indent = 0) const override;
+
+};
+
+class OrNode : public BinaryOperatorNode {
+    public:
+        OrNode(ExpressionNode* left, ExpressionNode* right);
+        int Evaluate() const override;
+        void virtual PrintTree(int indent = 0) const override;
+
+};

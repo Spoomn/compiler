@@ -50,7 +50,8 @@ TokenClass ScannerClass::GetNextToken(){
         std::cerr << "Error. BAD_TOKEN from lexeme:" << lexeme;
         std::exit(1);
     }
-
+    MSG("Final lexeme before unget: \"" << lexeme << "\"");
+    MSG("Final token type from mapping: " << previousTokenType << " (" << gTokenTypeNames[previousTokenType] << ")");
     lexeme.pop_back();
     mFin.unget();
     MSG("Number of lines: " << ScannerClass::GetLineNumber());

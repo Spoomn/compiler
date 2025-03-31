@@ -1,0 +1,28 @@
+void main()
+{
+    int a;
+    int b;
+    int c;
+
+    // Test arithmetic and operator precedence:
+    a = 3 + 4 * 2;          // Multiplication before addition → a = 3 + (4*2) = 11
+    b = (a - 1) / 2;        // Parentheses force subtraction before division → b = (11-1)/2 = 5
+
+    // If statement with relational and logical operators:
+    // If 'a' is greater than 'b' and 'b' is not zero, set c to a + b; otherwise, set c to a - b.
+    if ((a > b) && (b != 0)){
+        c = a + b;
+    }else{
+        c = a - b;
+    }
+    // While loop with a logical OR condition:
+    // As long as either c is less than 20 or a is less than 10, update a, b, and c.
+    while ((c < 20) || (a < 10)) {
+        a = a + 1;
+        b = b + 2;
+        c = c + a;
+    }
+
+    // Output the final value of c. (28)
+    cout << c;
+}

@@ -4,6 +4,7 @@
 #include "Symbol.h"
 #include "Node.h"
 #include "Parser.h"
+#include "Debug.h"
 #include <iostream>
 #include <cassert>
 #include <stdexcept>
@@ -12,12 +13,16 @@ void TestScanner();
 void TestSymbolTable();
 void TestParseTree();
 void TestParser();
+void TestOutputParser();
+void TestInterpreter();
 
 int main() {
     TestScanner();
     TestSymbolTable();
     TestParseTree();
     TestParser();
+    TestOutputParser();
+    TestInterpreter();
 
     return 0;
 }
@@ -49,7 +54,7 @@ void TestSymbolTable() {
     SymbolTableClass symTab;
     assert(symTab.GetCount() == 0);
 
-    // Test normal AddEntry for "x"
+
     try {
         symTab.AddEntry("x");
         std::cout << "Added entry 'x' successfully." << std::endl;
@@ -183,7 +188,7 @@ void TestParseTree() {
 }
 
 void TestParser() {
-    std::cout << "\n-- UNIT TEST: Parser --\n" << std::endl;
+    std::cout << "\n-- UNIT TEST: Parser (no output) --\n" << std::endl;
     
     const std::string testFiles[] = {
         "parser_test_1.txt",
@@ -200,3 +205,52 @@ void TestParser() {
         std::cout << "Test " << (i + 1) << " passed successfully." << std::endl;
     }
 }
+
+void TestOutputParser(){
+    std::cout << "\n-- UNIT TEST: Parser with output --\n" << std::endl;
+
+    ScannerClass scanner("parser_output_test_1.txt");
+    std::cout << "Original Code Input:\n" << std::endl;
+    std::ifstream file("parser_output_test_1.txt");
+    std::string line;
+    while (std::getline(file, line)) {
+        std::cout << line << std::endl;
+    }
+    SymbolTableClass symTab;
+    ParserClass parser(&scanner, &symTab);
+
+    StartNode* start = parser.Start();
+
+    
+    std::cout << "\n--- Parsed Tree Output ---\n" << std::endl;
+    start->PrintTree();
+    std::cout << "\n--- End of Parsed Tree Output ---\n" << std::endl;
+    std::cout << "Deleting parsed tree..." << std::endl;
+    delete start;
+    std::cout << "Parsed tree deleted" << std::endl;
+    std::cout << "\nParser with output test completed." << std::endl;
+}
+
+void TestInterpreter() {
+    std::cout << "\n-- UNIT TEST: Interpreter --\n" << std::endl;
+    
+
+    ScannerClass scanner("ifwhile_test.txt");
+    SymbolTableClass symTab;
+    ParserClass parser(&scanner, &symTab);
+    MSG("Starting parser...");
+    
+    StartNode* root = parser.Start();
+    
+    std::cout << "\n--- Parsed Tree Output ---\n" << std::endl;
+    root->PrintTree();
+    
+    std::cout << "\nInterpreting Program Output:\n" << std::endl;
+    root->Interpret();
+    std::cout << std::endl;
+    
+    delete root;
+    
+    std::cout << "\nInterpreter test completed." << std::endl;
+}
+

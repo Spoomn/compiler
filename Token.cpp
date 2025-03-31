@@ -13,6 +13,13 @@ TokenClass::TokenClass(TokenType type, const std::string& lexeme)
         mType = INT_TOKEN;
     else if (lexeme == "cout")
         mType = COUT_TOKEN;
+    else if (lexeme == "if")
+        mType = IF_TOKEN;
+    else if (lexeme == "while")
+        mType = WHILE_TOKEN;
+    else if (lexeme == "else")
+        mType = ELSE_TOKEN;
+    
 }
 
 std::ostream& operator<<(std::ostream& out, const TokenClass& tc) {

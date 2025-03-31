@@ -1,28 +1,5 @@
 void main (){
     int sum;
     sum = 35 + 400;
-    if sum != 450{
-        cout << sum;
-    }
+    cout << sum;
 } 
-
-int y = 5
-
-if(y < 5){
-    y = 5
-}
-
-<
->
-<=
->=
-// math!
-4 * 5 = 20
-
-sum = 20 / 4
-
-
-/* Block Comment 
-Ignore this line */
-
-main() // execute main function

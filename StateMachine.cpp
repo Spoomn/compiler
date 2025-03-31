@@ -120,6 +120,11 @@ StateMachineClass::StateMachineClass(){
         // Endfile also kills a line comment state
         mLegalMoves[LINE_COMMENT_STATE][ENDFILE_CHAR] = ENDFILE_STATE;
 
+    mLegalMoves[START_STATE][AND_CHAR] = POSSIBLE_AND_STATE;
+    mLegalMoves[POSSIBLE_AND_STATE][AND_CHAR] = AND_STATE;
+
+    mLegalMoves[START_STATE][OR_CHAR] = POSSIBLE_OR_STATE;
+    mLegalMoves[POSSIBLE_OR_STATE][OR_CHAR] = OR_STATE;
 
     // EOF
     mLegalMoves[START_STATE][ENDFILE_CHAR] = ENDFILE_STATE;
@@ -146,12 +151,15 @@ StateMachineClass::StateMachineClass(){
     mCorrespondingTokenTypes[INSERTION_STATE] = INSERTION_TOKEN;
     mCorrespondingTokenTypes[SEMICOLON_STATE] = SEMICOLON_TOKEN;
     mCorrespondingTokenTypes[EQUAL_STATE] = EQUAL_TOKEN;
+    mCorrespondingTokenTypes[AND_STATE] = AND_TOKEN;
+    mCorrespondingTokenTypes[OR_STATE] = OR_TOKEN;
     mCorrespondingTokenTypes[ASSIGNMENT_STATE] = ASSIGNMENT_TOKEN;    
     mCorrespondingTokenTypes[LPAREN_STATE] = LPAREN_TOKEN;
     mCorrespondingTokenTypes[RPAREN_STATE] = RPAREN_TOKEN;
     mCorrespondingTokenTypes[LCURLY_STATE] = LCURLY_TOKEN;
     mCorrespondingTokenTypes[RCURLY_STATE] = RCURLY_TOKEN;
     mCorrespondingTokenTypes[ENDFILE_STATE] = ENDFILE_TOKEN;
+    
 }
 
 MachineState StateMachineClass::UpdateState(char currentCharacter, TokenType & previousTokenType){
@@ -192,11 +200,18 @@ MachineState StateMachineClass::UpdateState(char currentCharacter, TokenType & p
         charType = SLASH_CHAR;
     else if(currentCharacter == '*')
         charType = ASTERISK_CHAR;
+    else if(currentCharacter == '&')
+        charType = AND_CHAR;
+    else if(currentCharacter == '|')
+        charType = OR_CHAR;
     else if(currentCharacter == EOF)
         charType = ENDFILE_CHAR;
 
+    MSG("Derived Character Type: " << charType);
+    MSG("Before update, mCurrentState: " << mCurrentState);
     previousTokenType = mCorrespondingTokenTypes[mCurrentState];
+    MSG("Previous token type (from mapping): " << previousTokenType << " (" << gTokenTypeNames[previousTokenType] << ")");
     mCurrentState = mLegalMoves[mCurrentState][charType];
-
+    MSG("After update, mCurrentState: " << mCurrentState);
     return mCurrentState;
 }

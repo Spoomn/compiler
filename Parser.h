@@ -2,6 +2,7 @@
 #include "Scanner.h"
 #include "Symbol.h"
 #include "Token.h"
+#include "Node.h"
 
 class ParserClass
 {
@@ -10,19 +11,33 @@ private:
     SymbolTableClass* mSymTab;
 
     TokenClass Match(TokenType expectedType);
+    
+    ProgramNode* Program();
+    BlockNode* Block();
+    StatementGroupNode* StatementGroup();
+    StatementNode* Statement();
 
-    void Program();
-    void Block();
-    void StatementGroup();
-    void Statement();
-    void DeclarationStatement();
-    void AssignmentStatement();
-    void CoutStatement();
-    void Expression();
-    void Identifier();
-    void Integer();
+    DeclarationStatementNode* DeclarationStatement();
+    AssignmentStatementNode* AssignmentStatement();
+    CoutStatementNode* CoutStatement();
+    ExpressionNode* Expression();
+    IdentifierNode* Identifier();
+    IntegerNode* Integer();
+    
+    ExpressionNode* Relational();
+
+    ExpressionNode* PlusMinus();
+    ExpressionNode* TimesDivide();
+    ExpressionNode* Factor();
+
+    ExpressionNode* And();
+    ExpressionNode* Or();
+
+    StatementNode* IfStatement();
+    StatementNode* WhileStatement();
+    
 
 public:
     ParserClass(ScannerClass* scanner, SymbolTableClass* symTab);
-    void Start();
+    StartNode* Start();
 };
