@@ -84,12 +84,13 @@ class BlockNode : public StatementNode {
 
 class DeclarationStatementNode : public StatementNode {
     public:
-        DeclarationStatementNode(IdentifierNode* identifier);
+        DeclarationStatementNode(IdentifierNode* identifier, ExpressionNode* expression);
         ~DeclarationStatementNode();
         void virtual PrintTree(int indent = 0) const override;
         void virtual Interpret() const override;
     private:
         IdentifierNode* identifier;
+        ExpressionNode* expression;
 };
 
 // These nodes are used to represent assignment statements in the parse tree.
@@ -136,6 +137,30 @@ class WhileStatementNode : public StatementNode {
         ExpressionNode* condition;
         StatementNode* body;
 };
+
+class RepeatStatementNode : public StatementNode {
+    public:
+        RepeatStatementNode(ExpressionNode* expression, StatementGroupNode* statementGroup);
+        ~RepeatStatementNode();
+        void virtual PrintTree(int indent = 0) const override;
+        void virtual Interpret() const override;
+    private:
+        ExpressionNode* expression;
+        StatementGroupNode* statementGroup;
+};
+
+class NullStatementNode : public StatementNode {
+    public:
+        NullStatementNode() {}
+        virtual ~NullStatementNode() {}
+        virtual void Interpret() const override {
+            // Empty statement: do nothing.
+        }
+        virtual void PrintTree(int indent) const override {
+            for (int i = 0; i < indent; i++) std::cout << "  ";
+            std::cout << "NullStatement" << std::endl;
+        }
+    };
 
 // EXPRESSION NODES
 // These nodes are used to represent expressions in the parse tree.
@@ -256,6 +281,14 @@ class EqualNode : public BinaryOperatorNode {
 class NotEqualNode : public BinaryOperatorNode {
     public:
         NotEqualNode(ExpressionNode* left, ExpressionNode* right);
+        int Evaluate() const override;
+        void virtual PrintTree(int indent = 0) const override;
+
+};
+
+class ModNode : public BinaryOperatorNode {
+    public:
+        ModNode(ExpressionNode* left, ExpressionNode* right);
         int Evaluate() const override;
         void virtual PrintTree(int indent = 0) const override;
 

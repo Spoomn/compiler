@@ -5,7 +5,7 @@
 StartNode::StartNode(ProgramNode* program) : program(program) {}
 
 StartNode::~StartNode() {
-    MSG(std::cout << "Deleting StartNode\n";)
+    MSG("Deleting StartNode\n");
     delete program;
 }
 
@@ -13,7 +13,7 @@ StartNode::~StartNode() {
 ProgramNode::ProgramNode(BlockNode* block) : block(block) {}
 
 ProgramNode::~ProgramNode() {
-    MSG(std::cout << "Deleting ProgramNode\n";)
+    MSG("Deleting ProgramNode\n");
     delete block;
 }
 
@@ -21,7 +21,7 @@ ProgramNode::~ProgramNode() {
 BlockNode::BlockNode(StatementGroupNode* statementGroup) : statementGroup(statementGroup) {}
 
 BlockNode::~BlockNode() {
-    MSG(std::cout << "Deleting BlockNode\n";)
+    MSG("Deleting BlockNode\n");
     delete statementGroup;
 }
 
@@ -32,7 +32,7 @@ void StatementGroupNode::AddStatement(StatementNode* statement) {
 
 StatementGroupNode::~StatementGroupNode() {
     for (StatementNode* stmt : statements) {
-        MSG(std::cout << "Deleting StatementNode \n";)
+        MSG("Deleting StatementNode \n");
         delete stmt;
     }
 }
@@ -41,7 +41,7 @@ IfStatementNode::IfStatementNode(ExpressionNode* condition, StatementNode* thenS
     : condition(condition), thenStmt(thenStmt), elseStmt(elseStmt) {}
 
 IfStatementNode::~IfStatementNode() {
-    MSG(std::cout << "Deleting IfStatementNode\n";)
+    MSG("Deleting IfStatementNode\n");
     delete condition;
     delete thenStmt;
     if(elseStmt){
@@ -54,19 +54,29 @@ WhileStatementNode::WhileStatementNode(ExpressionNode* condition, StatementNode*
     : condition(condition), body(body) {}
 
 WhileStatementNode::~WhileStatementNode() {
-    MSG(std::cout << "Deleting WhileStatementNode\n";)
+    MSG("Deleting WhileStatementNode\n");
     delete condition;
     delete body;
 }
 
+RepeatStatementNode::RepeatStatementNode(ExpressionNode* expression, StatementGroupNode* statementGroup) 
+    : expression(expression), statementGroup(statementGroup) {}
+
+RepeatStatementNode::~RepeatStatementNode() {
+    MSG("Deleting RepeatStatementNode\n");
+    delete expression;
+    delete statementGroup;
+}
+
+
 ExpressionNode::~ExpressionNode() {
-    MSG(std::cout << "Deleting ExpressionNode\n";)
+    MSG("Deleting ExpressionNode\n");
 }
 
 CoutStatementNode::CoutStatementNode(ExpressionNode* expression) : expression(expression) {}
 
 CoutStatementNode::~CoutStatementNode() {
-    MSG(std::cout << "Deleting CoutStatementNode\n";)
+    MSG("Deleting CoutStatementNode\n");
     delete expression;
 }
 
@@ -88,17 +98,18 @@ int IdentifierNode::Evaluate() const {
     return symbolTable->GetValue(label);
 }
 
-DeclarationStatementNode::DeclarationStatementNode(IdentifierNode* identifier) : identifier(identifier) {}
+DeclarationStatementNode::DeclarationStatementNode(IdentifierNode* identifier, ExpressionNode* expression) : identifier(identifier), expression(expression) {}
 
 DeclarationStatementNode::~DeclarationStatementNode() {
-    MSG(std::cout << "Deleting DeclarationStatementNode\n";)
+    MSG("Deleting DeclarationStatementNode\n");
     delete identifier;
+    delete expression;
 }
 
 AssignmentStatementNode::AssignmentStatementNode(IdentifierNode* identifier, ExpressionNode* expression) : identifier(identifier), expression(expression) {}
 
 AssignmentStatementNode::~AssignmentStatementNode() {
-    MSG(std::cout << "Deleting AssignmentStatementNode\n";)
+    MSG("Deleting AssignmentStatementNode\n");
     delete identifier;
     delete expression;
 }
@@ -113,7 +124,7 @@ int IntegerNode::Evaluate() const {
 BinaryOperatorNode::BinaryOperatorNode(ExpressionNode* left, ExpressionNode* right) : left(left), right(right) {}
 
 BinaryOperatorNode::~BinaryOperatorNode() {
-    MSG(std::cout << "Deleting BinaryOperatorNode\n";)
+    MSG( "Deleting BinaryOperatorNode\n");
     delete left;
     delete right;
 }
@@ -182,6 +193,16 @@ NotEqualNode::NotEqualNode(ExpressionNode* left, ExpressionNode* right) : Binary
 
 int NotEqualNode::Evaluate() const {
     return left->Evaluate() != right->Evaluate() ? 1 : 0;
+}
+
+ModNode::ModNode(ExpressionNode* left, ExpressionNode* right) : BinaryOperatorNode(left, right) {}
+
+int ModNode::Evaluate() const {
+    int rightValue = right->Evaluate();
+    if (rightValue == 0) {
+        throw std::runtime_error("Division by zero error");
+    }
+    return left->Evaluate() % rightValue;
 }
 
 AndNode::AndNode(ExpressionNode* left, ExpressionNode* right) : BinaryOperatorNode(left, right) {}
@@ -329,6 +350,12 @@ void NotEqualNode::PrintTree(int indent) const {
     if (right) right->PrintTree(indent + 1);
 }
 
+void ModNode::PrintTree(int indent) const {
+    for (int i = 0; i < indent; i++) std::cout << "  ";
+    std::cout << "Mod" << std::endl;
+    if (left) left->PrintTree(indent + 1);
+    if (right) right->PrintTree(indent + 1);
+}
 
 void DeclarationStatementNode::PrintTree(int indent) const {
     for (int i = 0; i < indent; i++) std::cout << "  ";
@@ -366,6 +393,13 @@ void WhileStatementNode::PrintTree(int indent) const {
     body->PrintTree(indent + 1);
 }
 
+void RepeatStatementNode::PrintTree(int indent) const {
+    for (int i = 0; i < indent; i++) std::cout << "  ";
+    std::cout << "RepeatStatement" << std::endl;
+    expression->PrintTree(indent + 1);
+    statementGroup->PrintTree(indent + 1);
+}
+
 void AndNode::PrintTree(int indent) const {
     for (int i = 0; i < indent; i++) std::cout << "  ";
     std::cout << "And" << std::endl;
@@ -401,6 +435,9 @@ void StatementGroupNode::Interpret() const {
 
 void DeclarationStatementNode::Interpret() const {
     identifier->DeclareVariable();
+    if(expression){
+        identifier->SetValue(expression->Evaluate());
+    }
 }
 
 void AssignmentStatementNode::Interpret() const {
@@ -423,4 +460,11 @@ void WhileStatementNode::Interpret() const {
     while (condition->Evaluate()) {
         body->Interpret();
     }
+}
+
+void RepeatStatementNode::Interpret() const {
+    int count = expression->Evaluate();
+    for(int i = 0; i < count; i++) {
+        statementGroup->Interpret();
+    }   
 }

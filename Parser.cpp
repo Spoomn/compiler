@@ -55,7 +55,8 @@ StatementGroupNode* ParserClass::StatementGroup() {
     StatementGroupNode* stmtGroup = new StatementGroupNode();
     TokenClass token = mScanner->PeekNextToken();
     TokenType tt = token.GetTokenType();
-    while (tt == INT_TOKEN || tt == IDENTIFIER_TOKEN || tt == COUT_TOKEN || tt == LCURLY_TOKEN || tt == IF_TOKEN || tt == WHILE_TOKEN) {
+    while (tt == INT_TOKEN || tt == IDENTIFIER_TOKEN || tt == COUT_TOKEN || tt == LCURLY_TOKEN ||
+         tt == IF_TOKEN || tt == WHILE_TOKEN || tt == REPEAT_TOKEN || tt == SEMICOLON_TOKEN) {
         StatementNode* stmt = Statement();
         if (stmt != nullptr) {
             stmtGroup->AddStatement(stmt);
@@ -88,6 +89,13 @@ StatementNode* ParserClass::Statement() {
     } else if (tt == LCURLY_TOKEN) {
         MSG("Statement recognized as Block (curly)");
         return Block();
+    } else if (tt == REPEAT_TOKEN) {
+        MSG("Statement recognized as RepeatStatement");
+        return RepeatStatement();
+    } else if (tt == SEMICOLON_TOKEN){
+        Match(SEMICOLON_TOKEN);
+        MSG("Statement recognized as SemiColon");
+        return new NullStatementNode();
     } else {
         MSG("Statement not recognized, returning null.");
         return nullptr;
@@ -97,8 +105,13 @@ StatementNode* ParserClass::Statement() {
 DeclarationStatementNode* ParserClass::DeclarationStatement() {
     Match(INT_TOKEN);
     IdentifierNode* idNode = Identifier();
+    ExpressionNode* expr = nullptr;
+    if (mScanner->PeekNextToken().GetTokenType() == ASSIGNMENT_TOKEN){
+        Match(ASSIGNMENT_TOKEN);
+        expr = Expression();
+    }
     Match(SEMICOLON_TOKEN);
-    DeclarationStatementNode* declStmt = new DeclarationStatementNode(idNode);
+    DeclarationStatementNode* declStmt = new DeclarationStatementNode(idNode, expr);
     return declStmt;
 }
 
@@ -146,6 +159,19 @@ StatementNode* ParserClass::WhileStatement() {
     StatementNode* body = Statement();
     
     return new WhileStatementNode(condition, body);
+}
+
+
+StatementNode* ParserClass::RepeatStatement() {
+    Match(REPEAT_TOKEN);
+    Match(LPAREN_TOKEN);
+    ExpressionNode* expr = Expression();
+    Match(RPAREN_TOKEN);
+    Match(LCURLY_TOKEN);
+    StatementGroupNode* stmtGroup = StatementGroup();
+    Match(RCURLY_TOKEN);
+    
+    return new RepeatStatementNode(expr, stmtGroup);
 }
 
 IdentifierNode* ParserClass::Identifier() {
@@ -202,6 +228,11 @@ ExpressionNode* ParserClass::Relational() {
         Match(tt);
         ExpressionNode* right = PlusMinus();
         return new NotEqualNode(left, right);
+    }
+    else if (tt == MOD_TOKEN){
+        Match(tt);
+        ExpressionNode* right = PlusMinus();
+        return new ModNode(left, right);
     }
     
     return left;

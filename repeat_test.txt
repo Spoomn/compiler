@@ -1,0 +1,9 @@
+void main(){
+    int sum;
+    sum = 5;
+    cout << sum;
+    repeat(sum + 2) {
+        cout << 100;
+        sum = sum + 1;
+    }
+}

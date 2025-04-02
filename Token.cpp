@@ -19,6 +19,10 @@ TokenClass::TokenClass(TokenType type, const std::string& lexeme)
         mType = WHILE_TOKEN;
     else if (lexeme == "else")
         mType = ELSE_TOKEN;
+    else if (lexeme == "or")
+        mType = OR_TOKEN;
+    else if (lexeme == "repeat")
+        mType = REPEAT_TOKEN;
     
 }
 

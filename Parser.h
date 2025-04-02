@@ -35,7 +35,7 @@ private:
 
     StatementNode* IfStatement();
     StatementNode* WhileStatement();
-    
+    StatementNode* RepeatStatement();
 
 public:
     ParserClass(ScannerClass* scanner, SymbolTableClass* symTab);

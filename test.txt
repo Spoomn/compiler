@@ -1,0 +1,11 @@
+void main(){
+    int x = 7;
+    int y = x-3;
+    cout << x;
+    cout << y;
+
+    int z;
+    z=10;
+    cout << z;
+
+}

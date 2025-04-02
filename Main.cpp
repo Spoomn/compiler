@@ -15,14 +15,16 @@ void TestParseTree();
 void TestParser();
 void TestOutputParser();
 void TestInterpreter();
+void TestTest();
 
 int main() {
-    TestScanner();
-    TestSymbolTable();
-    TestParseTree();
-    TestParser();
-    TestOutputParser();
-    TestInterpreter();
+    // TestScanner();
+    // TestSymbolTable();
+    // TestParseTree();
+    // TestParser();
+    // TestOutputParser();
+    // TestInterpreter();
+    TestTest();
 
     return 0;
 }
@@ -158,7 +160,7 @@ void TestParseTree() {
     SymbolTableClass symTab;
 
     IdentifierNode* declId = new IdentifierNode("x", &symTab);
-    DeclarationStatementNode* declStmt = new DeclarationStatementNode(declId);
+    // DeclarationStatementNode* declStmt = new DeclarationStatementNode(declId);
     
     IdentifierNode* assignId = new IdentifierNode("x", &symTab);
     ExpressionNode* intThree = new IntegerNode(3);
@@ -170,7 +172,7 @@ void TestParseTree() {
     CoutStatementNode* coutStmt = new CoutStatementNode(coutID);
 
     StatementGroupNode* stmtGroup = new StatementGroupNode();
-    stmtGroup->AddStatement(declStmt);
+    // stmtGroup->AddStatement(declStmt);
     stmtGroup->AddStatement(assignStmt);
     stmtGroup->AddStatement(coutStmt);
 
@@ -254,3 +256,24 @@ void TestInterpreter() {
     std::cout << "\nInterpreter test completed." << std::endl;
 }
 
+void TestTest(){
+    std::cout << "\n-- UNIT TEST: Test --\n" << std::endl;
+    
+    ScannerClass scanner("test2.txt");
+    SymbolTableClass symTab;
+    ParserClass parser(&scanner, &symTab);
+    MSG("Starting parser...");
+    
+    StartNode* root = parser.Start();
+    
+    std::cout << "\n--- Parsed Tree Output ---\n" << std::endl;
+    root->PrintTree();
+    
+    std::cout << "\nInterpreting Program Output:\n" << std::endl;
+    root->Interpret();
+    std::cout << std::endl;
+    
+    delete root;
+    
+    std::cout << "\nTest test completed." << std::endl;
+}

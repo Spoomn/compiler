@@ -126,6 +126,8 @@ StateMachineClass::StateMachineClass(){
     mLegalMoves[START_STATE][OR_CHAR] = POSSIBLE_OR_STATE;
     mLegalMoves[POSSIBLE_OR_STATE][OR_CHAR] = OR_STATE;
 
+    mLegalMoves[START_STATE][MOD_CHAR] = MOD_STATE;
+
     // EOF
     mLegalMoves[START_STATE][ENDFILE_CHAR] = ENDFILE_STATE;
     
@@ -151,6 +153,7 @@ StateMachineClass::StateMachineClass(){
     mCorrespondingTokenTypes[INSERTION_STATE] = INSERTION_TOKEN;
     mCorrespondingTokenTypes[SEMICOLON_STATE] = SEMICOLON_TOKEN;
     mCorrespondingTokenTypes[EQUAL_STATE] = EQUAL_TOKEN;
+    mCorrespondingTokenTypes[MOD_STATE] = MOD_TOKEN;
     mCorrespondingTokenTypes[AND_STATE] = AND_TOKEN;
     mCorrespondingTokenTypes[OR_STATE] = OR_TOKEN;
     mCorrespondingTokenTypes[ASSIGNMENT_STATE] = ASSIGNMENT_TOKEN;    
@@ -204,6 +207,8 @@ MachineState StateMachineClass::UpdateState(char currentCharacter, TokenType & p
         charType = AND_CHAR;
     else if(currentCharacter == '|')
         charType = OR_CHAR;
+    else if(currentCharacter == '%')
+        charType = MOD_CHAR;
     else if(currentCharacter == EOF)
         charType = ENDFILE_CHAR;
 

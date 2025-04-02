@@ -8,7 +8,6 @@ ScannerClass::ScannerClass(const std::string &inputFileName) {
 
     mFin.open(inputFileName.c_str(), std::ios::binary);
 
-    // Check if the file opened successfully
     if (!mFin) {
         std::cerr << "Error opening input file: " << inputFileName << '\n';
         std::cerr << "Ensure the file exists and is in the same directory as Scanner.cpp\n";
