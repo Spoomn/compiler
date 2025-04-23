@@ -113,15 +113,18 @@ class AssignmentStatementNode : public StatementNode {
         ExpressionNode* expression;
 };
 
+#include <vector>
+
 class CoutStatementNode : public StatementNode {
     public:
-        CoutStatementNode(ExpressionNode* expression);
+        CoutStatementNode(const std::vector<ExpressionNode*>& items);
         ~CoutStatementNode();
+
         void virtual PrintTree(int indent = 0) const override;
         void virtual Interpret() const override;
         void virtual Code(InstructionsClass &machineCode) override;
     private:
-        ExpressionNode* expression;
+        std::vector<ExpressionNode*> items;
 };
 
 class IfStatementNode : public StatementNode {
@@ -334,3 +337,27 @@ class OrNode : public BinaryOperatorNode {
         void virtual PrintTree(int indent = 0) const override;
 
 };
+
+class PlusEqualsStatementNode : public StatementNode {
+    public:
+        PlusEqualsStatementNode(IdentifierNode* id, ExpressionNode* expr);
+        ~PlusEqualsStatementNode();
+        virtual void PrintTree(int indent = 0) const override;
+        virtual void Interpret() const override;
+        virtual void Code(InstructionsClass &machineCode) override;
+    private:
+        IdentifierNode* identifier;
+        ExpressionNode* expression;
+    };
+    
+class MinusEqualsStatementNode : public StatementNode {
+    public:
+        MinusEqualsStatementNode(IdentifierNode* id, ExpressionNode* expr);
+        ~MinusEqualsStatementNode();
+        virtual void PrintTree(int indent = 0) const override;
+        virtual void Interpret() const override;
+        virtual void Code(InstructionsClass &machineCode) override;
+    private:
+        IdentifierNode* identifier;
+        ExpressionNode* expression;
+    };

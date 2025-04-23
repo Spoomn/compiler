@@ -3,7 +3,7 @@ const int MAX_DATA = 5000;
 class InstructionsClass
 {
 public:
-InstructionsClass(); 
+	InstructionsClass(); 
 	void Finish(); 
 	void Execute(); 
 	void PushValue(int value);
@@ -34,6 +34,8 @@ InstructionsClass();
 	void SetOffset(unsigned char * codeAddress, int offset);
 	void PrintAllMachineCodes();
 
+	void WriteEndLinux64();
+
 
 private:
 	unsigned char mCode[MAX_INSTRUCTIONS]; 
@@ -45,6 +47,7 @@ private:
 	char mMinusString; // Holds '-'
 	char mSpaceString; // Holds ' '
     int mData[MAX_DATA];
+	char mEndlString = '\n';
 
     void Encode(unsigned char c);
     void Encode(int x);

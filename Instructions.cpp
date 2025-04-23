@@ -664,3 +664,22 @@ void InstructionsClass::PrintAllMachineCodes()
 	printf("HEX: %2x  Decimal: %3i\n", (int)mCode[i], (int)mCode[i]);
 	}
 }
+
+void InstructionsClass::WriteEndLinux64()
+{
+	Encode(IMMEDIATE_TO_EAX);
+	Encode((int)1);
+
+	Encode(IMMEDIATE_TO_EDI);
+	Encode((int)1);
+
+	Encode(BIT64);
+	Encode(IMMEDIATE_TO_ESI);
+	Encode(&mEndlString);
+
+    Encode(IMMEDIATE_TO_EDX);
+    Encode((int)1);
+
+    Encode((unsigned char)SYS_CALL1);
+    Encode((unsigned char)SYS_CALL2);
+}

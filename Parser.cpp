@@ -1,5 +1,6 @@
 #include "Parser.h"
 #include "Debug.h"
+#include <vector>
 #include <iostream>
 #include <cstdlib>
 
@@ -75,8 +76,8 @@ StatementNode* ParserClass::Statement() {
         MSG("Statement recognized as DeclarationStatement");
         return DeclarationStatement();
     } else if (tt == IDENTIFIER_TOKEN) {
-        MSG("Statement recognized as AssignmentStatement");
-        return AssignmentStatement();
+        MSG("Statement recognized as AssignmentOrCompoundStatement");
+        return AssignmentOrCompoundStatement();
     } else if (tt == COUT_TOKEN) {
         MSG("Statement recognized as CoutStatement");
         return CoutStatement();
@@ -115,22 +116,63 @@ DeclarationStatementNode* ParserClass::DeclarationStatement() {
     return declStmt;
 }
 
-AssignmentStatementNode* ParserClass::AssignmentStatement() {
-    IdentifierNode* idNode = Identifier();
-    Match(ASSIGNMENT_TOKEN);
-    ExpressionNode* expr = Expression();
-    Match(SEMICOLON_TOKEN);
-    AssignmentStatementNode* assignStmt = new AssignmentStatementNode(idNode, expr);
-    return assignStmt;
+// AssignmentStatementNode* ParserClass::AssignmentStatement() {
+//     IdentifierNode* idNode = Identifier();
+//     Match(ASSIGNMENT_TOKEN);
+//     ExpressionNode* expr = Expression();
+//     Match(SEMICOLON_TOKEN);
+//     AssignmentStatementNode* assignStmt = new AssignmentStatementNode(idNode, expr);
+//     return assignStmt;
+// }
+
+StatementNode* ParserClass::AssignmentOrCompoundStatement() {
+    IdentifierNode* id = Identifier();
+    TokenType tt = mScanner->PeekNextToken().GetTokenType();
+    if (tt == ASSIGNMENT_TOKEN) {
+        Match(ASSIGNMENT_TOKEN);
+        ExpressionNode* rhs = Expression();
+        Match(SEMICOLON_TOKEN);
+        return new AssignmentStatementNode(id, rhs);
+    }
+    else if (tt == PLUS_EQUAL_TOKEN) {
+        Match(PLUS_EQUAL_TOKEN);
+        ExpressionNode* rhs = Expression();
+        Match(SEMICOLON_TOKEN);
+        return new PlusEqualsStatementNode(id, rhs);
+    }
+    else if (tt == MINUS_EQUAL_TOKEN) {
+        Match(MINUS_EQUAL_TOKEN);
+        ExpressionNode* rhs = Expression();
+        Match(SEMICOLON_TOKEN);
+        return new MinusEqualsStatementNode(id, rhs);
+    }
+    else {
+        std::cerr << "Error: expected =, += or -= after identifier\n";
+        std::exit(1);
+    }
 }
 
-CoutStatementNode* ParserClass::CoutStatement() {
+CoutStatementNode *ParserClass::CoutStatement()
+{
     Match(COUT_TOKEN);
-    Match(INSERTION_TOKEN);
-    ExpressionNode* expr = Expression();
+    std::vector<ExpressionNode*> items;
+    do{
+        Match(INSERTION_TOKEN);
+        TokenClass next = mScanner->PeekNextToken();
+        if(next.GetTokenType() == ENDL_TOKEN){
+            Match(ENDL_TOKEN);
+            items.push_back(nullptr);
+
+        }else{
+            ExpressionNode* expr = Expression();
+            items.push_back(expr);
+        }
+
+    }
+    while(mScanner->PeekNextToken().GetTokenType() == INSERTION_TOKEN);
+
     Match(SEMICOLON_TOKEN);
-    CoutStatementNode* coutStmt = new CoutStatementNode(expr);
-    return coutStmt;
+    return new CoutStatementNode(items);
 }
 
 StatementNode* ParserClass::IfStatement() {

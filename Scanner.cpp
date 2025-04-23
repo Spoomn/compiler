@@ -23,6 +23,43 @@ ScannerClass::~ScannerClass() {
 
 TokenClass ScannerClass::GetNextToken(){
     MSG("\nGetting next token...");
+    while(true){
+        int p = mFin.peek();
+        if (p == EOF) {
+            return TokenClass(ENDFILE_TOKEN, "");
+        }
+        char c = static_cast<char>(p);
+        if (c == ' ' || c == '\t' || c == '\r') {
+            mFin.get();
+            continue;
+        }
+        if (c == '\n') {
+            mFin.get();
+            mLineNumber++;
+            continue;
+        }
+        break;
+    }
+
+    int c1 = mFin.peek();
+    if (c1 == '+'){
+        mFin.get();
+        int c2 = mFin.peek();
+        if (c2 == '='){
+            mFin.get();
+            return TokenClass(PLUS_EQUAL_TOKEN, "+=");
+        }
+        mFin.unget();
+    } else if (c1 == '-'){
+        mFin.get();
+        int c2 = mFin.peek();
+        if (c2 == '='){
+            mFin.get();
+            return TokenClass(MINUS_EQUAL_TOKEN, "-=");
+        }
+        mFin.unget();
+    }
+
     StateMachineClass stateMachine;
     std::string lexeme;
     MachineState currentState;
@@ -56,13 +93,15 @@ TokenClass ScannerClass::GetNextToken(){
     MSG("Number of lines: " << ScannerClass::GetLineNumber());
     if (previousTokenType == IDENTIFIER_TOKEN) {
         if (lexeme == "VOID") {
-             previousTokenType = VOID_TOKEN;
+            previousTokenType = VOID_TOKEN;
         } else if (lexeme == "MAIN") {
-             previousTokenType = MAIN_TOKEN;
+            previousTokenType = MAIN_TOKEN;
         } else if (lexeme == "INT") {
-             previousTokenType = INT_TOKEN;
+            previousTokenType = INT_TOKEN;
         } else if (lexeme == "COUT") {
-             previousTokenType = COUT_TOKEN;
+            previousTokenType = COUT_TOKEN;
+        } else if (lexeme == "endl"){
+            previousTokenType = ENDL_TOKEN;
         }
     }
     TokenClass tc(previousTokenType, lexeme);

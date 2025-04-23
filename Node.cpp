@@ -239,28 +239,50 @@ ExpressionNode::~ExpressionNode() {
     MSG("Deleting ExpressionNode\n");
 }
 
-CoutStatementNode::CoutStatementNode(ExpressionNode* expression) : expression(expression) {}
+CoutStatementNode::CoutStatementNode(const std::vector<ExpressionNode *> &items) : items(items) {}
 
-CoutStatementNode::~CoutStatementNode() {
+CoutStatementNode::~CoutStatementNode()
+{
     MSG("Deleting CoutStatementNode\n");
-    delete expression;
+    for (auto ptr : items){
+        if (ptr) delete ptr;
+    }
 }
 
 void CoutStatementNode::Interpret() const {
-    std::cout << expression->Evaluate() << std::endl;
+    for (auto ptr : items) {
+        if (ptr) {
+            std::cout << ptr->Evaluate() << " ";
+        }
+        else {
+            std::cout << std::endl;
+        }
+
+    }
 }
 
 void CoutStatementNode::Code(InstructionsClass &machineCode)
 {
-    expression->CodeEvaluate(machineCode);
-    machineCode.PopAndWrite();
-    MSG("Printing value\n");
+    for (auto ptr : items){
+        if (ptr){
+            ptr->CodeEvaluate(machineCode);
+            machineCode.PopAndWrite();
+        }else{
+            machineCode.WriteEndLinux64();
+        }
+    }
 }
 
 void CoutStatementNode::PrintTree(int indent) const {
     for (int i = 0; i < indent; i++) std::cout << "  ";
-    std::cout << "Cout" << std::endl;
-    expression->PrintTree(indent + 1);
+    std::cout << "CoutChain" << std::endl;
+    for (auto ptr : items) {
+        if (ptr) ptr->PrintTree(indent+1);
+        else {
+            for (int i = 0; i < indent+1; i++) std::cout << "  ";
+            std::cout << "endl" << std::endl;
+        }
+    }
 }
 
 
@@ -665,4 +687,69 @@ void OrNode::PrintTree(int indent) const {
 
 void NullStatementNode::Code(InstructionsClass &machineCode)
 {
+}
+
+
+PlusEqualsStatementNode::PlusEqualsStatementNode(IdentifierNode* id, ExpressionNode* expr)
+  : identifier(id), expression(expr) {}
+
+PlusEqualsStatementNode::~PlusEqualsStatementNode() {
+    delete identifier;
+    delete expression;
+}
+
+void PlusEqualsStatementNode::PrintTree(int indent) const
+{
+    for (int i = 0; i < indent; i++) std::cout << "  ";
+    std::cout << "PlusEqualsStatement" << std::endl;
+    if (identifier) {
+        identifier->PrintTree(indent + 1);
+    }
+    if (expression) {
+        expression->PrintTree(indent + 1);
+    }
+}
+
+void PlusEqualsStatementNode::Interpret() const {
+    int old = identifier->Evaluate();
+    int right = expression->Evaluate();
+    identifier->SetValue(old + right);
+}
+
+void PlusEqualsStatementNode::Code(InstructionsClass &machineCode) {
+    machineCode.PushVariable(identifier->GetIndex());
+    expression->CodeEvaluate(machineCode);
+    machineCode.PopPopAddPush();
+    machineCode.PopAndStore(identifier->GetIndex());
+}
+
+MinusEqualsStatementNode::MinusEqualsStatementNode(IdentifierNode* id, ExpressionNode* expr)
+  : identifier(id), expression(expr) {}
+
+MinusEqualsStatementNode::~MinusEqualsStatementNode() {
+    delete identifier;
+    delete expression;
+
+}
+void MinusEqualsStatementNode::PrintTree(int indent) const
+{
+    for (int i = 0; i < indent; i++) std::cout << "  ";
+    std::cout << "MinusEqualsStatement" << std::endl;
+    if (identifier) {
+        identifier->PrintTree(indent + 1);
+    }
+    if (expression) {
+        expression->PrintTree(indent + 1);
+    }
+}
+void MinusEqualsStatementNode::Interpret() const {
+    int old = identifier->Evaluate();
+    int right = expression->Evaluate();
+    identifier->SetValue(old - right);
+}
+void MinusEqualsStatementNode::Code(InstructionsClass &machineCode) {
+    machineCode.PushVariable(identifier->GetIndex());
+    expression->CodeEvaluate(machineCode);
+    machineCode.PopPopSubPush();
+    machineCode.PopAndStore(identifier->GetIndex());
 }

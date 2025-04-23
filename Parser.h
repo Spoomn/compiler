@@ -18,7 +18,10 @@ private:
     StatementNode* Statement();
 
     DeclarationStatementNode* DeclarationStatement();
-    AssignmentStatementNode* AssignmentStatement();
+    // AssignmentStatementNode* AssignmentStatement();
+    StatementNode* AssignmentOrCompoundStatement();
+
+
     CoutStatementNode* CoutStatement();
     ExpressionNode* Expression();
     IdentifierNode* Identifier();
@@ -41,3 +44,4 @@ public:
     ParserClass(ScannerClass* scanner, SymbolTableClass* symTab);
     StartNode* Start();
 };
+
