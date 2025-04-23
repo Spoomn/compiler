@@ -26,7 +26,7 @@ int main() {
     // TestOutputParser();
     // TestInterpreter();
     // TestTest();
-    CodeAndExecute("test.txt");
+    CodeAndExecute("test2.txt");
 
     return 0;
 }

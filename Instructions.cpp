@@ -665,6 +665,19 @@ void InstructionsClass::PrintAllMachineCodes()
 	}
 }
 
+int InstructionsClass::AllocateSlot()
+{
+    return NextFreeSlot++;
+}
+
+void InstructionsClass::RegisterVariableSlot(int slot)
+{
+	if (slot+1 > NextFreeSlot)
+	{
+		NextFreeSlot = slot + 1;
+	}
+}
+
 void InstructionsClass::WriteEndLinux64()
 {
 	Encode(IMMEDIATE_TO_EAX);

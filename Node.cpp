@@ -132,11 +132,25 @@ void IfStatementNode::Interpret() const {
 void IfStatementNode::Code(InstructionsClass &machineCode)
 {
     condition->CodeEvaluate(machineCode);
-    unsigned char * InsertAddress = machineCode.SkipIfZeroStack();
-    unsigned char * address1 = machineCode.GetAddress();
+
+    unsigned char* skipThenAddr = machineCode.SkipIfZeroStack();
+    unsigned char* thenStart   = machineCode.GetAddress();
+
     thenStmt->Code(machineCode);
-    unsigned char * address2 = machineCode.GetAddress();
-    machineCode.SetOffset(InsertAddress, (int)(address2 - address1));
+
+    unsigned char* jumpOverElse = machineCode.Jump();
+    unsigned char* elseStart    = machineCode.GetAddress();
+
+    machineCode.SetOffset(skipThenAddr,
+                         static_cast<int>(elseStart - thenStart));
+
+    if (elseStmt) {
+        elseStmt->Code(machineCode);
+    }
+    unsigned char* afterElse = machineCode.GetAddress();
+
+    machineCode.SetOffset(jumpOverElse,
+                         static_cast<int>(afterElse - elseStart));
 }
 
 void IfStatementNode::PrintTree(int indent) const {
@@ -202,30 +216,31 @@ void RepeatStatementNode::Interpret() const {
 
 void RepeatStatementNode::Code(InstructionsClass &machineCode)
 {
+    int slot = machineCode.AllocateSlot();
+
     expression->CodeEvaluate(machineCode);
-    machineCode.PopAndStoreTemp();
+    machineCode.PopAndStore(slot);
 
     unsigned char* loopHead = machineCode.GetAddress();
 
-    machineCode.PushTemp();
+    machineCode.PushVariable(slot);
     unsigned char* skipAddr = machineCode.SkipIfZeroStack();
-    unsigned char* loopBodyAddr = machineCode.GetAddress();
+    unsigned char* bodyStart = machineCode.GetAddress();
 
     statementGroup->Code(machineCode);
 
-    machineCode.PushTemp();
+    machineCode.PushVariable(slot);
     machineCode.PushValue(1);
     machineCode.PopPopSubPush();
-    machineCode.PopAndStoreTemp();
+    machineCode.PopAndStore(slot);
 
     unsigned char* backJump = machineCode.Jump();
     unsigned char* afterLoop = machineCode.GetAddress();
 
-    machineCode.SetOffset(skipAddr, static_cast<int>(afterLoop - loopBodyAddr));
-    machineCode.SetOffset(backJump, (int)(loopHead - afterLoop));
-
-
-
+    machineCode.SetOffset(skipAddr,
+                         static_cast<int>(afterLoop - bodyStart));
+    machineCode.SetOffset(backJump,
+                         static_cast<int>(loopHead - afterLoop));
 }
 
 void RepeatStatementNode::PrintTree(int indent) const {

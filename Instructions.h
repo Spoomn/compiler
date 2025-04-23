@@ -34,6 +34,9 @@ public:
 	void SetOffset(unsigned char * codeAddress, int offset);
 	void PrintAllMachineCodes();
 
+	int AllocateSlot();
+	void RegisterVariableSlot(int slot);
+
 	void WriteEndLinux64();
 
 
@@ -48,6 +51,7 @@ private:
 	char mSpaceString; // Holds ' '
     int mData[MAX_DATA];
 	char mEndlString = '\n';
+	int NextFreeSlot = 0;
 
     void Encode(unsigned char c);
     void Encode(int x);
