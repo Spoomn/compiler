@@ -1,15 +1,15 @@
 # clang++ -Wall -g -o myProgram Main.cpp Scanner.cpp StateMachine.cpp Token.cpp
 # Compiler
-CXX = clang++
+CXX = g++
 
 # Compiler flags
-CXXFLAGS = -Wall -g -stdlib=libc++ -std=c++11
+CXXFLAGS = -Wall -g -std=c++11
 
 # Output program name
 TARGET = main
 
 # Source files
-SRCS = Main.cpp Token.cpp StateMachine.cpp Scanner.cpp Symbol.cpp Node.cpp Parser.cpp
+SRCS = Main.cpp Token.cpp StateMachine.cpp Scanner.cpp Symbol.cpp Node.cpp Parser.cpp Instructions.cpp
 
 # Object files
 OBJS = $(SRCS:.cpp=.o)

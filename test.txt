@@ -1,11 +1,37 @@
-void main(){
-    int x = 7;
-    int y = x-3;
-    cout << x;
-    cout << y;
+void main()
+{
+    int sum;
+    sum = 35 + 400;
+    cout << sum; // 435
 
-    int z;
-    z=10;
-    cout << z;
+    int diff;
+    diff = sum - 100;
+    cout << diff; // 335
 
+    int prod;
+    prod = sum * diff;
+    cout << prod; // 145725
+
+    int quot;
+    quot = prod / 5;
+    cout << quot; // 29145
+
+    if (quot >= 1000)
+    {
+        cout << 1; // This should print
+    }
+    else
+    {
+        cout << 0; // This should not print
+    }
+
+    int counter;
+    counter = 0;
+    while (counter < 3)
+    {
+        cout << counter; // 0 1 2
+        counter = counter + 1;
+    }
+
+    // final output: 435 335 145725 29145 1 0 1 2 3
 }

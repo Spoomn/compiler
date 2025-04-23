@@ -9,13 +9,14 @@
 #include <cassert>
 #include <stdexcept>
 
-void TestScanner();
-void TestSymbolTable();
-void TestParseTree();
-void TestParser();
-void TestOutputParser();
-void TestInterpreter();
-void TestTest();
+// void TestScanner();
+// void TestSymbolTable();
+// void TestParseTree();
+// void TestParser();
+// void TestOutputParser();
+// void TestInterpreter();
+// void TestTest();
+void CodeAndExecute(const std::string &filename);
 
 int main() {
     // TestScanner();
@@ -24,7 +25,8 @@ int main() {
     // TestParser();
     // TestOutputParser();
     // TestInterpreter();
-    TestTest();
+    // TestTest();
+    CodeAndExecute("test.txt");
 
     return 0;
 }
@@ -155,39 +157,39 @@ void TestSymbolTable() {
     std::cout << "SymbolTableClass tests passed successfully!" << std::endl;
 }
 
-void TestParseTree() {
-    std::cout << "\n-- UNIT TEST: Parse Tree --\n" << std::endl;
-    SymbolTableClass symTab;
+// void TestParseTree() {
+//     std::cout << "\n-- UNIT TEST: Parse Tree --\n" << std::endl;
+//     SymbolTableClass symTab;
 
-    IdentifierNode* declId = new IdentifierNode("x", &symTab);
-    // DeclarationStatementNode* declStmt = new DeclarationStatementNode(declId);
+//     // IdentifierNode* declId = new IdentifierNode("x", &symTab);
+//     // DeclarationStatementNode* declStmt = new DeclarationStatementNode(declId);
     
-    IdentifierNode* assignId = new IdentifierNode("x", &symTab);
-    ExpressionNode* intThree = new IntegerNode(3);
-    ExpressionNode* intFour = new IntegerNode(4);
-    ExpressionNode* plusExpr = new TimesNode(intThree, intFour);
-    AssignmentStatementNode* assignStmt = new AssignmentStatementNode(assignId, plusExpr);
+//     IdentifierNode* assignId = new IdentifierNode("x", &symTab);
+//     ExpressionNode* intThree = new IntegerNode(3);
+//     ExpressionNode* intFour = new IntegerNode(4);
+//     ExpressionNode* plusExpr = new TimesNode(intThree, intFour);
+//     AssignmentStatementNode* assignStmt = new AssignmentStatementNode(assignId, plusExpr);
 
-    IdentifierNode* coutID = new IdentifierNode("x", &symTab);
-    CoutStatementNode* coutStmt = new CoutStatementNode(coutID);
+//     IdentifierNode* coutID = new IdentifierNode("x", &symTab);
+//     CoutStatementNode* coutStmt = new CoutStatementNode(coutID);
 
-    StatementGroupNode* stmtGroup = new StatementGroupNode();
-    // stmtGroup->AddStatement(declStmt);
-    stmtGroup->AddStatement(assignStmt);
-    stmtGroup->AddStatement(coutStmt);
+//     StatementGroupNode* stmtGroup = new StatementGroupNode();
+//     // stmtGroup->AddStatement(declStmt);
+//     stmtGroup->AddStatement(assignStmt);
+//     stmtGroup->AddStatement(coutStmt);
 
-    BlockNode* block = new BlockNode(stmtGroup);
+//     BlockNode* block = new BlockNode(stmtGroup);
 
-    ProgramNode* program = new ProgramNode(block);
+//     ProgramNode* program = new ProgramNode(block);
 
-    StartNode* start = new StartNode(program);
-    int mathResult = plusExpr->Evaluate();
-    assert(mathResult == 12);
-    std::cout << "Math result: " << mathResult << std::endl;
-    delete start;
+//     StartNode* start = new StartNode(program);
+//     int mathResult = plusExpr->Evaluate();
+//     assert(mathResult == 12);
+//     std::cout << "Math result: " << mathResult << std::endl;
+//     delete start;
 
-    std::cout << "Parse tree nodes successfully deleted." << std::endl;
-}
+//     std::cout << "Parse tree nodes successfully deleted." << std::endl;
+// }
 
 void TestParser() {
     std::cout << "\n-- UNIT TEST: Parser (no output) --\n" << std::endl;
@@ -276,4 +278,27 @@ void TestTest(){
     delete root;
     
     std::cout << "\nTest test completed." << std::endl;
+}
+
+void CodeAndExecute(const std::string &filename)
+{
+    // 1) build the scanner, symbol table, and parser
+    ScannerClass    scanner(filename);
+    SymbolTableClass symbolTable;
+    ParserClass     parser(&scanner, &symbolTable);
+
+    // 2) parse → AST
+    StartNode * root = parser.Start();
+
+    // 3) generate your bytecodes
+    InstructionsClass machineCode;
+    root->Code(machineCode);
+    machineCode.Finish();
+    // machineCode.PrintAllMachineCodes();
+
+    // 4) run them on your VM
+    machineCode.Execute();
+
+    // 5) tear down the AST
+    delete root;
 }
