@@ -1,21 +1,26 @@
 void main()
 {
+    // ADDITION
     int sum;
     sum = 35 + 400;
     cout << sum; // 435
 
-    int diff;
-    diff = sum - 100;
+    // SUBTRACTION
+    int diff = sum - 100; // INLINE VARIABLE DECLARATION
+    // diff = sum - 100;
     cout << diff; // 335
 
+    // MULTIPLICATION
     int prod;
     prod = sum * diff;
     cout << prod; // 145725
 
+    // DIVISION
     int quot;
     quot = prod / 5;
     cout << quot; // 29145
 
+    // IF/ELSE
     if (quot >= 1000)
     {
         cout << 1; // This should print
@@ -25,13 +30,31 @@ void main()
         cout << 0; // This should not print
     }
 
+    // WHILE LOOP
     int counter;
     counter = 0;
+
     while (counter < 3)
     {
         cout << counter; // 0 1 2
         counter = counter + 1;
     }
 
-    // final output: 435 335 145725 29145 1 0 1 2 3
+    // REPEAT LOOP
+    repeat(3){
+        cout << 4;
+    }
+
+    if(counter < 10){
+        if(quot >= 1000){
+            cout << 5;
+            counter = 0;
+        }
+    }
+
+    int mod;
+    mod = 11 % 2;
+    cout << mod;
+
+    // final output: 435 335 145725 29145 1 0 1 2 3 4 4 4 5
 }

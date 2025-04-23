@@ -203,6 +203,28 @@ void RepeatStatementNode::Interpret() const {
 void RepeatStatementNode::Code(InstructionsClass &machineCode)
 {
     expression->CodeEvaluate(machineCode);
+    machineCode.PopAndStoreTemp();
+
+    unsigned char* loopHead = machineCode.GetAddress();
+
+    machineCode.PushTemp();
+    unsigned char* skipAddr = machineCode.SkipIfZeroStack();
+    unsigned char* loopBodyAddr = machineCode.GetAddress();
+
+    statementGroup->Code(machineCode);
+
+    machineCode.PushTemp();
+    machineCode.PushValue(1);
+    machineCode.PopPopSubPush();
+    machineCode.PopAndStoreTemp();
+
+    unsigned char* backJump = machineCode.Jump();
+    unsigned char* afterLoop = machineCode.GetAddress();
+
+    machineCode.SetOffset(skipAddr, static_cast<int>(afterLoop - loopBodyAddr));
+    machineCode.SetOffset(backJump, (int)(loopHead - afterLoop));
+
+
 
 }
 
@@ -590,6 +612,7 @@ void ModNode::CodeEvaluate(InstructionsClass &machineCode)
 {
     left ->CodeEvaluate(machineCode);
     right->CodeEvaluate(machineCode);
+    machineCode.PopPopModPush();
 }
     
 

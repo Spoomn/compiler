@@ -11,10 +11,12 @@ InstructionsClass();
 	unsigned char * GetAddress();
 	void PushVariable(int index);
 	void PopAndStore(int index);
+	void PopAndStoreTemp();
 	void PopPopDivPush();
 	void PopPopAddPush();
 	void PopPopSubPush();
 	void PopPopMulPush();
+	void PopPopModPush();
 
 	void PopPopLessPush();
 	void PopPopLessEqualPush();
@@ -26,6 +28,7 @@ InstructionsClass();
 	void PopPopAndPush();
 	void PopPopOrPush();
 
+	void PushTemp();
 	unsigned char * SkipIfZeroStack();
 	unsigned char * Jump();
 	void SetOffset(unsigned char * codeAddress, int offset);

@@ -353,6 +353,13 @@ void InstructionsClass::PopAndStore(int index)
     Encode(GetMem(index)); // Get the RAM address using GetMem and encode it
 }
 
+void InstructionsClass::PopAndStoreTemp()
+{
+	Encode(POP_EAX);
+	Encode(EAX_TO_MEM);
+	Encode(&mTempInteger);
+}
+
 void InstructionsClass::Call(void * function_address)
 {
 	unsigned char * a1 = (unsigned char*)function_address;
@@ -497,6 +504,16 @@ void InstructionsClass::PopPopMulPush()
     Encode(PUSH_EAX);
 }
 
+void InstructionsClass::PopPopModPush()
+{
+	Encode(POP_EBX);
+	Encode(POP_EAX);
+	Encode(CDQ);
+	Encode(DIV_EAX_EBX1);
+	Encode(DIV_EAX_EBX2);
+	Encode(PUSH_EDX);
+}
+
 void InstructionsClass::PopPopSubPush()
 {
     Encode(POP_EBX);
@@ -604,7 +621,14 @@ void InstructionsClass::PopPopOrPush()
         Encode(PUSH_EAX); // push 1 or 0
 }
 
-unsigned char * InstructionsClass::SkipIfZeroStack()
+void InstructionsClass::PushTemp()
+{
+	Encode(MEM_TO_EAX);
+	Encode(&mTempInteger);
+	Encode(PUSH_EAX);
+}
+
+unsigned char *InstructionsClass::SkipIfZeroStack()
 {
         Encode(POP_EBX);
         Encode(IMMEDIATE_TO_EAX); // load A register with 0
