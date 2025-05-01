@@ -1,6 +1,7 @@
 #include "Node.h"
 #include "Symbol.h"
 #include "Debug.h"
+#include <cmath>
 
 StartNode::StartNode(ProgramNode* program) : program(program) {}
 
@@ -197,6 +198,48 @@ void WhileStatementNode::PrintTree(int indent) const {
     condition->PrintTree(indent + 1);
     body->PrintTree(indent + 1);
 }
+
+DoWhileStatementNode::DoWhileStatementNode(StatementNode* body, ExpressionNode* condition) 
+    : body(body), condition(condition) {}
+
+DoWhileStatementNode::~DoWhileStatementNode() {
+    MSG("Deleting DoStatementNode\n");
+    delete condition;
+    delete body;
+}
+
+void DoWhileStatementNode::Interpret() const {
+    do {
+        body->Interpret();
+    } while (condition->Evaluate());
+}
+
+void DoWhileStatementNode::Code(InstructionsClass &machineCode)
+{
+    unsigned char* address1 = machineCode.GetAddress();
+
+    body->Code(machineCode);
+
+    condition->CodeEvaluate(machineCode);
+
+    unsigned char* insertSkip = machineCode.SkipIfZeroStack();
+    unsigned char* address2 = machineCode.GetAddress();
+
+    unsigned char* insertJump = machineCode.Jump();
+    unsigned char* address3 = machineCode.GetAddress();
+
+    machineCode.SetOffset(insertSkip, static_cast<int>(address3 - address2));
+
+    machineCode.SetOffset(insertJump, static_cast<int>(address1 - address3));
+}
+
+void DoWhileStatementNode::PrintTree(int indent) const {
+    for (int i = 0; i < indent; i++) std::cout << "  ";
+    std::cout << "DoWhileStatement" << std::endl;
+    body->PrintTree(indent + 1);
+    condition->PrintTree(indent + 1);
+}
+
 
 RepeatStatementNode::RepeatStatementNode(ExpressionNode* expression, StatementGroupNode* statementGroup) 
     : expression(expression), statementGroup(statementGroup) {}
@@ -767,4 +810,137 @@ void MinusEqualsStatementNode::Code(InstructionsClass &machineCode) {
     expression->CodeEvaluate(machineCode);
     machineCode.PopPopSubPush();
     machineCode.PopAndStore(identifier->GetIndex());
+}
+
+ForStatementNode::ForStatementNode(StatementNode* init,
+    ExpressionNode* cond,
+    StatementNode* step,
+    StatementNode* body)
+: initStmt(init), condition(cond), stepStmt(step), body(body) {}
+
+ForStatementNode::~ForStatementNode() {
+delete initStmt;
+delete condition;
+delete stepStmt;
+delete body;
+}
+
+void ForStatementNode::Interpret() const {
+    if (initStmt) initStmt->Interpret();
+    while (!condition || condition->Evaluate()) {
+        body->Interpret();
+        if (stepStmt) stepStmt->Interpret();
+    }
+}
+
+void ForStatementNode::Code(InstructionsClass& machineCode) {
+    if (initStmt) initStmt->Code(machineCode);
+
+    unsigned char* address1 = machineCode.GetAddress();
+
+    if (condition) {
+        condition->CodeEvaluate(machineCode);
+    }
+    unsigned char* insertSkip = condition
+    ? machineCode.SkipIfZeroStack()
+    : nullptr;
+    unsigned char* address2 = machineCode.GetAddress();
+
+    body->Code(machineCode);
+
+    if (stepStmt) stepStmt->Code(machineCode);
+
+    unsigned char* insertJump = machineCode.Jump();
+    unsigned char* address3    = machineCode.GetAddress();
+
+    machineCode.SetOffset(insertJump,
+    static_cast<int>(address1 - address3));
+    if (condition) {
+    machineCode.SetOffset(insertSkip,
+    static_cast<int>(address3 - address2));
+    }
+}
+
+void ForStatementNode::PrintTree(int indent) const {
+    for (int i = 0; i < indent; i++) std::cout << "  ";
+        std::cout << "ForStatement" << std::endl;
+        if (initStmt)   initStmt->PrintTree(indent + 1);
+        if (condition)  condition->PrintTree(indent + 1);
+        if (stepStmt)   stepStmt->PrintTree(indent + 1);
+        if (body)       body->PrintTree(indent + 1);
+}
+
+PlusPlusStatementNode::PlusPlusStatementNode(IdentifierNode *id)
+  : identifier(id) {}
+
+PlusPlusStatementNode::~PlusPlusStatementNode() {
+    delete identifier;
+}
+
+void PlusPlusStatementNode::PrintTree(int indent) const
+{
+    for (int i = 0; i < indent; i++) std::cout << "  ";
+    std::cout << "PlusPlusStatement" << std::endl;
+    if (identifier) {
+        identifier->PrintTree(indent + 1);
+    }
+}
+
+void PlusPlusStatementNode::Interpret() const {
+    int old = identifier->Evaluate();
+    identifier->SetValue(old + 1);
+}
+
+void PlusPlusStatementNode::Code(InstructionsClass &machineCode) {
+    machineCode.PushVariable(identifier->GetIndex());
+    machineCode.PushValue(1);
+    machineCode.PopPopAddPush();
+    machineCode.PopAndStore(identifier->GetIndex());
+}
+
+MinusMinusStatementNode::MinusMinusStatementNode(IdentifierNode *id)
+  : identifier(id) {}
+
+MinusMinusStatementNode::~MinusMinusStatementNode() {
+    delete identifier;
+}
+
+void MinusMinusStatementNode::PrintTree(int indent) const
+{
+    for (int i = 0; i < indent; i++) std::cout << "  ";
+    std::cout << "MinusMinusStatement" << std::endl;
+    if (identifier) {
+        identifier->PrintTree(indent + 1);
+    }
+}
+
+void MinusMinusStatementNode::Interpret() const {
+    int old = identifier->Evaluate();
+    identifier->SetValue(old - 1);
+}
+
+void MinusMinusStatementNode::Code(InstructionsClass &machineCode) {
+    machineCode.PushVariable(identifier->GetIndex());
+    machineCode.PushValue(1);
+    machineCode.PopPopSubPush();
+    machineCode.PopAndStore(identifier->GetIndex());
+}
+
+ExponentNode::ExponentNode(ExpressionNode *left, ExpressionNode *right): BinaryOperatorNode(left, right) {}
+
+void ExponentNode::CodeEvaluate(InstructionsClass &mc) {
+    int result = this->Evaluate();
+    mc.PushValue(result);
+}
+
+int ExponentNode::Evaluate() const
+{
+    return pow(left->Evaluate(), right->Evaluate());
+}
+
+void ExponentNode::PrintTree(int indent) const {
+    for (int i = 0; i < indent; i++) std::cout << "  ";
+    std::cout << "Exponent" << std::endl;
+    if (left) left->PrintTree(indent + 1);
+    if (right) right->PrintTree(indent + 1);
 }

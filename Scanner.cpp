@@ -40,25 +40,53 @@ TokenClass ScannerClass::GetNextToken(){
         }
         break;
     }
-
+    
+    if (mFin.peek() == '<') {
+        mFin.get(); 
+        if (mFin.peek() == '<') {     
+            mFin.get();                
+            return TokenClass(INSERTION_TOKEN, "<<");
+        }
+        mFin.unget();
+    }
     int c1 = mFin.peek();
-    if (c1 == '+'){
-        mFin.get();
+    if (c1 == '+') {
+        mFin.get();  
         int c2 = mFin.peek();
-        if (c2 == '='){
+        if (c2 == '+') { 
+            mFin.get();
+            return TokenClass(PLUS_PLUS_TOKEN, "++");
+        }
+        else if (c2 == '=') { 
             mFin.get();
             return TokenClass(PLUS_EQUAL_TOKEN, "+=");
         }
         mFin.unget();
-    } else if (c1 == '-'){
+    }
+    else if (c1 == '-') {
         mFin.get();
         int c2 = mFin.peek();
-        if (c2 == '='){
+        if (c2 == '-') {              
+            mFin.get();
+            return TokenClass(MINUS_MINUS_TOKEN, "--");
+        }
+        else if (c2 == '=') {        
             mFin.get();
             return TokenClass(MINUS_EQUAL_TOKEN, "-=");
         }
         mFin.unget();
     }
+    // exponent python style
+    else if (c1 == '*'){
+        mFin.get();
+        int c2 = mFin.peek();
+        if (c2 == '*') {              
+            mFin.get();
+            return TokenClass(POWER_TOKEN, "**");
+        }
+        mFin.unget();
+    }
+    
 
     StateMachineClass stateMachine;
     std::string lexeme;

@@ -140,6 +140,23 @@ class IfStatementNode : public StatementNode {
         StatementNode* elseStmt;
 };
 
+class ForStatementNode : public StatementNode {
+    private:
+        StatementNode* initStmt;
+        ExpressionNode* condition;
+        StatementNode* stepStmt;
+        StatementNode* body;
+    public:
+        ForStatementNode(StatementNode* init,
+                         ExpressionNode* cond,
+                         StatementNode* step,
+                         StatementNode* body);
+        ~ForStatementNode() override;
+        void Interpret() const override;
+        void Code(InstructionsClass& machineCode) override;
+        void PrintTree(int indent) const override;
+    };
+
 class WhileStatementNode : public StatementNode {
     public:
         WhileStatementNode(ExpressionNode* condition, StatementNode* body);
@@ -151,6 +168,20 @@ class WhileStatementNode : public StatementNode {
         ExpressionNode* condition;
         StatementNode* body;
 };
+
+class DoWhileStatementNode : public StatementNode {
+    public:
+        DoWhileStatementNode(StatementNode* body, ExpressionNode* condition);
+        ~DoWhileStatementNode();
+    
+        virtual void Interpret() const override;
+        virtual void Code(InstructionsClass &machineCode) override;
+        virtual void PrintTree(int indent = 0) const override;
+    
+    private:
+        StatementNode* body;
+        ExpressionNode* condition;
+    };
 
 class RepeatStatementNode : public StatementNode {
     public:
@@ -361,3 +392,36 @@ class MinusEqualsStatementNode : public StatementNode {
         IdentifierNode* identifier;
         ExpressionNode* expression;
     };
+
+class PlusPlusStatementNode : public StatementNode {
+    public:
+        PlusPlusStatementNode(IdentifierNode* id);
+        ~PlusPlusStatementNode();
+        virtual void PrintTree(int indent = 0) const override;
+        virtual void Interpret() const override;
+        virtual void Code(InstructionsClass &machineCode) override;
+    private:
+        IdentifierNode* identifier;
+    };
+
+class MinusMinusStatementNode : public StatementNode {
+    public:
+        MinusMinusStatementNode(IdentifierNode* id);
+        ~MinusMinusStatementNode();
+        virtual void PrintTree(int indent = 0) const override;
+        virtual void Interpret() const override;
+        virtual void Code(InstructionsClass &machineCode) override;
+    private:
+        IdentifierNode* identifier;
+    };
+
+// class PrintStatementNode : public StatementNode 
+
+class ExponentNode : public BinaryOperatorNode {
+    public:
+        ExponentNode(ExpressionNode* left, ExpressionNode* right);
+        int Evaluate() const override;
+        virtual void CodeEvaluate(InstructionsClass &machineCode) override;
+        void virtual PrintTree(int indent = 0) const override;
+
+};

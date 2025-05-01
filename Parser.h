@@ -31,14 +31,17 @@ private:
 
     ExpressionNode* PlusMinus();
     ExpressionNode* TimesDivide();
+    ExpressionNode* Power();
     ExpressionNode* Factor();
 
     ExpressionNode* And();
     ExpressionNode* Or();
 
     StatementNode* IfStatement();
+    StatementNode* ForStatement();
     StatementNode* WhileStatement();
-    StatementNode* RepeatStatement();
+    StatementNode *DoWhileStatement();
+    StatementNode *RepeatStatement();
 
 public:
     ParserClass(ScannerClass* scanner, SymbolTableClass* symTab);

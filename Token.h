@@ -3,11 +3,12 @@
 
 enum TokenType {
 	// Reserved Words:
-	VOID_TOKEN, MAIN_TOKEN, INT_TOKEN, COUT_TOKEN, ENDL_TOKEN, IF_TOKEN, WHILE_TOKEN, ELSE_TOKEN, REPEAT_TOKEN,
+	VOID_TOKEN, MAIN_TOKEN, INT_TOKEN, COUT_TOKEN, ENDL_TOKEN, IF_TOKEN, WHILE_TOKEN, ELSE_TOKEN, FOR_TOKEN, REPEAT_TOKEN, DO_TOKEN,
 	// Relational Operators:
 	LESS_TOKEN, LESSEQUAL_TOKEN, GREATER_TOKEN, GREATEREQUAL_TOKEN, EQUAL_TOKEN, NOTEQUAL_TOKEN, MOD_TOKEN,
 	// Other Operators:
 	INSERTION_TOKEN, ASSIGNMENT_TOKEN, PLUS_EQUAL_TOKEN, MINUS_EQUAL_TOKEN, PLUS_TOKEN, MINUS_TOKEN, TIMES_TOKEN, DIVIDE_TOKEN,
+	 PLUS_PLUS_TOKEN, MINUS_MINUS_TOKEN, POWER_TOKEN,
 	// Logical Operators:
 	AND_TOKEN, OR_TOKEN,
 	// Other Characters:
@@ -20,11 +21,12 @@ enum TokenType {
 // IMPORTANT: The list above and the list below MUST be kept in sync.
 const std::string gTokenTypeNames[] = {
 	// Reserved Words:
-	"VOID", "MAIN", "INT", "COUT", "ENDL", "IF", "WHILE", "ELSE", "REPEAT",
+	"VOID", "MAIN", "INT", "COUT", "ENDL", "IF", "WHILE", "ELSE", "FOR", "REPEAT", "DO",
 	// Relational Operators:
 	"LESS", "LESSEQUAL", "GREATER", "GREATEREQUAL", "EQUAL", "NOTEQUAL", "MOD",
 	// Other Operators:
 	"INSERTION", "ASSIGNMENT", "PLUS_EQUAL", "MINUS_EQUAL", "PLUS", "MINUS", "TIMES", "DIVIDE",
+	 "PLUS_PLUS", "MINUS_MINUS", "POWER",
 	// Logical Operators:
 	"AND", "OR",
 	// Other Characters:

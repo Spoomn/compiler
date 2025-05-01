@@ -17,6 +17,7 @@ public:
 	void PopPopSubPush();
 	void PopPopMulPush();
 	void PopPopModPush();
+	void PopPopExponentPush();
 
 	void PopPopLessPush();
 	void PopPopLessEqualPush();

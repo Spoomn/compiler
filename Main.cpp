@@ -26,7 +26,7 @@ int main() {
     // TestOutputParser();
     // TestInterpreter();
     // TestTest();
-    CodeAndExecute("test2.txt");
+    CodeAndExecute("test.txt");
 
     return 0;
 }
@@ -290,13 +290,13 @@ void CodeAndExecute(const std::string &filename)
     // 2) parse → AST
     StartNode * root = parser.Start();
 
-    // 3) generate your bytecodes
+    // 3) generate bytecodes
     InstructionsClass machineCode;
     root->Code(machineCode);
     machineCode.Finish();
     // machineCode.PrintAllMachineCodes();
 
-    // 4) run them on your VM
+    // 4) run them on VM
     machineCode.Execute();
 
     // 5) tear down the AST

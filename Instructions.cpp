@@ -514,6 +514,22 @@ void InstructionsClass::PopPopModPush()
 	Encode(PUSH_EDX);
 }
 
+void InstructionsClass::PopPopExponentPush()
+{
+	Encode(POP_EBX);
+	Encode(POP_EAX);
+	Encode(IMMEDIATE_TO_ECX);
+	Encode((int)2);
+	Encode(POP_EBX);
+	Encode(CMP_EAX_EBX1);
+	Encode(CMP_EAX_EBX2);
+	Encode(JE); 
+	Encode((unsigned char)7);
+	Encode(IMMEDIATE_TO_EAX); 
+	Encode(1);
+	Encode(PUSH_EAX); 
+}
+
 void InstructionsClass::PopPopSubPush()
 {
     Encode(POP_EBX);
@@ -532,11 +548,7 @@ void InstructionsClass::PopPopComparePush(unsigned char
     Encode(CMP_EAX_EBX2); // The FLAG register is now set.
     Encode(IMMEDIATE_TO_EAX); // load A register with 1
     Encode(1); // assume the result of compare is 1, or TRUE.
-    Encode(relational_operator); 
-    // Depending on the FLAG register and this 
-    // particular relational_operator,
-    // possibly skip around setting A register
-    // to zero, or FALSE, leaving it at TRUE.
+    Encode(relational_operator); // if the compare is not true, jump to FALSE code
     Encode((unsigned char)5);
     Encode(IMMEDIATE_TO_EAX); // load A register with 0
     Encode(0);

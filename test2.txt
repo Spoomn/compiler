@@ -39,11 +39,20 @@ void main()
         cout << counter; // 0 1 2
         counter = counter + 1;
     }
+    cout << endl;
+
 
     // REPEAT LOOP
     repeat(3){
         cout << 4;
     }
+    cout << endl;
+
+    // FOR LOOP
+    for (int s = 0; s < 5; s += 1) {
+        cout << s;
+    }
+    cout << endl;
 
     // NESTED IF STATEMENTS
     if(counter < 10){
@@ -129,8 +138,7 @@ void main()
     } else {
       cout << 440 << endl;
     }
-
-    // MIXED IF‐ELSE AND ++/-- SHORTHAND
+    
     int m = 10;
     if (m != 10) {
         m += 5;
@@ -139,6 +147,23 @@ void main()
     }
     cout << m << endl;    // m was 10, so now 7
 
+
+    int i = 0;
+    do {
+        cout << i;
+        i += 1;
+    } while (i <= 5);
+    cout << endl;
+
+    x = 11;
+    if (x > 10 && x < 20){
+        do {
+            x += 1;
+            i += 1;
+            cout << 43;
+        } while (i < 55)
+    }
+
     // FINAL PRINT
     cout << endl;
 
@@ -146,11 +171,13 @@ void main()
     /* FINAL OUTPUT:
     435 335 145725 29145 1 0 1 2 3 4 4 4 5
     1 
-    4 8 15 16 23 42 
+    4 8 15 
+    
+    16 23
+    42 
     5
     -5
-    6 7 8 9 10 4
-    1
+    6 7 8 9 10 4 1
     0
     1
     0
@@ -160,9 +187,10 @@ void main()
     1
     1
     0
-    123456
+    1 2 3 4 5 6
     1
     440
     7
+    0 1 2 3 4 5
     */
 }

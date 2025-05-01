@@ -57,7 +57,7 @@ StatementGroupNode* ParserClass::StatementGroup() {
     TokenClass token = mScanner->PeekNextToken();
     TokenType tt = token.GetTokenType();
     while (tt == INT_TOKEN || tt == IDENTIFIER_TOKEN || tt == COUT_TOKEN || tt == LCURLY_TOKEN ||
-         tt == IF_TOKEN || tt == WHILE_TOKEN || tt == REPEAT_TOKEN || tt == SEMICOLON_TOKEN) {
+         tt == IF_TOKEN || tt == FOR_TOKEN || tt == WHILE_TOKEN || tt == DO_TOKEN || tt == REPEAT_TOKEN || tt == SEMICOLON_TOKEN) {
         StatementNode* stmt = Statement();
         if (stmt != nullptr) {
             stmtGroup->AddStatement(stmt);
@@ -84,9 +84,15 @@ StatementNode* ParserClass::Statement() {
     } else if (tt == IF_TOKEN) {
         MSG("Statement recognized as IfStatement");
         return IfStatement();
+    } else if (tt == FOR_TOKEN) {
+        MSG("Statement recognized as ForStatement");
+        return ForStatement();
     } else if (tt == WHILE_TOKEN) {
         MSG("Statement recognized as WhileStatement");
         return WhileStatement();
+    } else if (tt == DO_TOKEN) {
+        MSG("Statement recognized as DoWhileStatement");
+        return DoWhileStatement(); 
     } else if (tt == LCURLY_TOKEN) {
         MSG("Statement recognized as Block (curly)");
         return Block();
@@ -146,8 +152,18 @@ StatementNode* ParserClass::AssignmentOrCompoundStatement() {
         Match(SEMICOLON_TOKEN);
         return new MinusEqualsStatementNode(id, rhs);
     }
+    else if (tt == PLUS_PLUS_TOKEN) {
+        Match(PLUS_PLUS_TOKEN);
+        Match(SEMICOLON_TOKEN);
+        return new PlusPlusStatementNode(id);
+    }
+    else if (tt == MINUS_MINUS_TOKEN) {
+        Match(MINUS_MINUS_TOKEN);
+        Match(SEMICOLON_TOKEN);
+        return new MinusMinusStatementNode(id);
+    }
     else {
-        std::cerr << "Error: expected =, += or -= after identifier\n";
+        std::cerr << "Error: expected =, +=, -=, ++, or -- after identifier\n";
         std::exit(1);
     }
 }
@@ -192,6 +208,65 @@ StatementNode* ParserClass::IfStatement() {
     return new IfStatementNode(condition, thenStmt, elseStmt);
 }
 
+StatementNode* ParserClass::ForStatement() {
+    Match(FOR_TOKEN);
+    Match(LPAREN_TOKEN);
+
+    StatementNode* initStmt = nullptr;
+    if (mScanner->PeekNextToken().GetTokenType() != SEMICOLON_TOKEN) {
+        if (mScanner->PeekNextToken().GetTokenType() == INT_TOKEN) {
+            initStmt = DeclarationStatement();
+        } else {
+            IdentifierNode* id = Identifier();
+            Match(ASSIGNMENT_TOKEN);
+            ExpressionNode* expr = Expression();
+            initStmt = new AssignmentStatementNode(id, expr);
+            Match(SEMICOLON_TOKEN);
+        }
+    } else {
+        Match(SEMICOLON_TOKEN);
+    }
+
+    ExpressionNode* condExpr = nullptr;
+    if (mScanner->PeekNextToken().GetTokenType() != SEMICOLON_TOKEN) {
+        condExpr = Expression();
+    }
+    Match(SEMICOLON_TOKEN);
+
+    StatementNode* stepStmt = nullptr;
+    if (mScanner->PeekNextToken().GetTokenType() != RPAREN_TOKEN) {
+        IdentifierNode* id2 = Identifier();
+        TokenType tt2 = mScanner->PeekNextToken().GetTokenType();
+        if (tt2 == ASSIGNMENT_TOKEN) {
+            Match(ASSIGNMENT_TOKEN);
+            ExpressionNode* expr2 = Expression();
+            stepStmt = new AssignmentStatementNode(id2, expr2);
+        } else if (tt2 == PLUS_EQUAL_TOKEN) {
+            Match(PLUS_EQUAL_TOKEN);
+            ExpressionNode* expr2 = Expression();
+            stepStmt = new PlusEqualsStatementNode(id2, expr2);
+        } else if (tt2 == MINUS_EQUAL_TOKEN) {
+            Match(MINUS_EQUAL_TOKEN);
+            ExpressionNode* expr2 = Expression();
+            stepStmt = new MinusEqualsStatementNode(id2, expr2);
+        } else if (tt2 == PLUS_PLUS_TOKEN) {
+            Match(PLUS_PLUS_TOKEN);
+            stepStmt = new PlusPlusStatementNode(id2);
+        } else if (tt2 == MINUS_MINUS_TOKEN) {
+            Match(MINUS_MINUS_TOKEN);
+            stepStmt = new MinusMinusStatementNode(id2);
+        } else {
+            std::cerr << "Error in ForStatement: expected assignment or increment/decrement operator after identifier\n";
+            std::exit(1);
+        }
+    }
+    Match(RPAREN_TOKEN);
+
+    StatementNode* body = Statement();
+
+    return new ForStatementNode(initStmt, condExpr, stepStmt, body);
+}
+
 StatementNode* ParserClass::WhileStatement() {
     Match(WHILE_TOKEN);
     Match(LPAREN_TOKEN);
@@ -201,6 +276,21 @@ StatementNode* ParserClass::WhileStatement() {
     StatementNode* body = Statement();
     
     return new WhileStatementNode(condition, body);
+}
+
+StatementNode* ParserClass::DoWhileStatement() {
+    Match(DO_TOKEN);
+    StatementNode* body = Statement();
+    Match(WHILE_TOKEN);
+    Match(LPAREN_TOKEN);
+    ExpressionNode* condition = Expression();
+    Match(RPAREN_TOKEN);
+    // Optional semicolon
+    if (mScanner->PeekNextToken().GetTokenType() == SEMICOLON_TOKEN) {
+        Match(SEMICOLON_TOKEN);
+    }
+    
+    return new DoWhileStatementNode(body, condition);
 }
 
 
@@ -231,7 +321,7 @@ IntegerNode* ParserClass::Integer() {
 }
 
 // ExpressionNode Order of Operations:
-// Expression -> Or -> And -> Relational -> PlusMinus -> TimesDivide -> Factor
+// Expression -> Or -> And -> Relational -> PlusMinus -> TimesDivide -> Power -> Factor
 ExpressionNode* ParserClass::Expression() {
     return Or();
 }
@@ -300,17 +390,17 @@ ExpressionNode* ParserClass::PlusMinus(){
 }
 
 ExpressionNode* ParserClass::TimesDivide(){
-    ExpressionNode* current = Factor();
+    ExpressionNode* current = Power();
 
     while(true){
         TokenType tt= mScanner->PeekNextToken().GetTokenType();
         if(tt== TIMES_TOKEN){
             Match(tt);
-            current = new TimesNode(current, Factor());
+            current = new TimesNode(current, Power());
         }
         else if (tt==DIVIDE_TOKEN){
             Match(tt);
-            current = new DivideNode(current, Factor());
+            current = new DivideNode(current, Power());
         }
         else{
             return current;
@@ -337,6 +427,20 @@ ExpressionNode* ParserClass::Factor() {
                   << token.GetLexeme() << "\"." << std::endl;
         std::exit(1);
     }
+}
+
+ExpressionNode *ParserClass::Power()
+{
+    ExpressionNode* current = Factor();
+    while (true) {
+        TokenType tt = mScanner->PeekNextToken().GetTokenType();
+        if (tt == POWER_TOKEN) {
+            Match(tt);
+            current = new ExponentNode(current, Factor());
+        } else {
+            return current;
+        }
+    }    
 }
 
 ExpressionNode* ParserClass::And(){
